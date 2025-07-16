@@ -1,0 +1,93 @@
+(*
+  EBNF Grammar for the DBSoup (Database Soup) format.
+  This grammar describes the syntax for documenting database schemas
+  in a standardized, human-readable, and machine-parsable format.
+
+  Version: 1.0
+  Author: Gemini
+*)
+
+dbsoup_document ::= header?, relationships_definition?, schema_definition, { comment };
+
+header ::= "@", identifier, ".dbsoup", NEWLINE;
+
+relationships_definition ::= "=== RELATIONSHIP DEFINITIONS ===", NEWLINE, { relationship_declaration | comment | blank_line };
+
+relationship_declaration ::= relationship_type_header | relationship_line;
+
+relationship_type_header ::= "# ", relationship_type_name, NEWLINE;
+
+relationship_line ::= identifier, " -> ", identifier, " [", relationship_cardinality, "]", [ " (", relationship_nature, ")" ], [ " via ", identifier ], [ inline_comment ], NEWLINE;
+
+relationship_cardinality ::= "1:1" | "1:M" | "M:N" | "inheritance" | "composition" | "aggregation";
+
+relationship_nature ::= "composition" | "aggregation" | "association" | "inheritance" | "dependency";
+
+relationship_type_name ::= "One-to-One Relationships" | "One-to-Many Relationships" | "Many-to-Many Relationships" | 
+                          "Inheritance Relationships" | "Composition Relationships" | "Aggregation Relationships" | 
+                          "Dependency Relationships";
+
+schema_definition ::= "=== DATABASE SCHEMA ===", NEWLINE, module_list, { module_section };
+
+module_list ::= { "+", identifier, [ inline_comment ], NEWLINE | comment }, NEWLINE;
+
+module_section ::= "=== ", identifier, " ====", NEWLINE, { entity_definition | comment | blank_line };
+
+entity_definition ::= ( standard_entity | embedded_entity );
+
+standard_entity ::= identifier, [ inline_comment ], NEWLINE,
+                   "============", { "=" }, NEWLINE,
+                   { field | comment | blank_line },
+                   { relationship_section | feature_section | comment | blank_line };
+
+embedded_entity ::= identifier, [ inline_comment ], NEWLINE,
+                   "/", { "=" }, "/", NEWLINE,
+                   { field | comment | blank_line },
+                   { relationship_section | feature_section | comment | blank_line };
+
+comment ::= "#", text_until_newline, NEWLINE;
+
+field ::= field_prefixes, field_name_list, " : ", data_type, [ constraints ], [ inline_comment ], NEWLINE;
+
+field_prefixes ::= field_prefix, { field_prefix };
+field_prefix ::= "*" | "-" | "!" | "@" | "~" | ">" | "$";
+
+field_name_list ::= identifier, { ",", identifier };
+
+data_type ::= simple_type | parametric_type | array_type | json_object_type | relationship_array_type | embedded_entity_type;
+simple_type ::= identifier;
+parametric_type ::= identifier, "(", literal, { ",", literal }, ")";
+array_type ::= "Array<", data_type, ">";
+relationship_array_type ::= identifier, "[", cardinality, "]";
+embedded_entity_type ::= identifier; (* Single entity relationship - use field prefix (* or -) to indicate required/optional *)
+cardinality ::= number, "..", ( number | "*" );
+json_object_type ::= "JSON", [ "{", NEWLINE, { json_field }, "}" ];
+json_field ::= identifier, ":", data_type, [","], NEWLINE;
+
+constraints ::= { "[", constraint_content, { ",", constraint_content }, "]" };
+constraint_content ::= identifier, [ ":", text_until_bracket_or_comma ];
+
+relationship_section ::= "# RELATIONSHIPS", NEWLINE, { relationship_line | relationship_detail | comment | blank_line };
+relationship_line ::= "@ relationships::", text_until_newline, [ inline_comment ], NEWLINE;
+relationship_detail ::= "## ", identifier, ".", identifier, " -> ", identifier, ".", identifier, [ inline_comment ], NEWLINE;
+
+feature_section ::= "# ", text_until_newline, NEWLINE, { text_until_newline, NEWLINE };
+
+(* Comment types *)
+inline_comment ::= " #", text_until_newline;  (* Inline comment after content, with at least one space before # *)
+blank_line ::= NEWLINE;  (* Empty line for spacing *)
+
+(* --- Terminal Symbols (Lexical Tokens) --- *)
+
+identifier ::= LETTER, { LETTER | DIGIT | "_" };
+literal ::= string | number;
+string ::= "'", {? any character except "'" ?}, "'" |
+           '"', {? any character except '"' ?}, '"';
+number ::= DIGIT, { DIGIT };
+
+text_until_newline ::= {? any character except NEWLINE ?};
+text_until_bracket_or_comma ::= {? any character except "]" or "," ?};
+
+LETTER ::= "a"..."z" | "A"..."Z";
+DIGIT ::= "0"..."9";
+NEWLINE ::= ? system-dependent newline character ?; 
