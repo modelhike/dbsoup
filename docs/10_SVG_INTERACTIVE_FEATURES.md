@@ -71,7 +71,7 @@ Stop
 * _id        : ObjectId     [PK]              # Entity has id="Stop" for navigation
 - name       : String
 - location   : String
-- addon      : StopAddOn                      # Darker yellow, clickable → jumps to StopAddOn
+- addon      : StopAddOn                      # Bright yellow, clickable → jumps to StopAddOn
 
 # Nested embedded entity
 StopAddOn
@@ -110,13 +110,13 @@ StopAddOn
 - **Indexed**: Blue (#5352ed)
 - **Optional**: Gray (#c7c7c7) - Lowest priority
 
-#### Embedded Entity Fields
-- **Embedded Entity Reference**: Darker Yellow (#fdd835) - Highest priority
-- **Foreign Key**: Light Purple (#c39bd3) **[Clickable]**
-- **Sensitive**: Red (#e74c3c)
-- **Required**: Orange (#e67e22)
-- **Indexed**: Purple (#8e44ad)
-- **Optional**: Purple (#a569bd) - Lowest priority
+#### Embedded Entity Fields (Consistent with Standard)
+- **Embedded Entity Reference**: Bright Yellow (#ffeb3b) **[Clickable]** - Highest priority
+- **Foreign Key**: Purple (#e056fd) **[Clickable]** - same as standard
+- **Sensitive**: Red (#ff4757) - same as standard  
+- **Required**: Orange (#ffa502) - same as standard
+- **Indexed**: Blue (#5352ed) - same as standard
+- **Optional**: Gray (#c7c7c7) - Lowest priority, same as standard
 
 ## 🧭 Navigation Examples
 
@@ -282,7 +282,7 @@ Address
 * _id        : ObjectId     [PK]              # Entity has id="Address" for navigation
 - street     : String
 - city       : String
-- contact    : ContactInfo                    # Darker yellow, clickable → jumps to ContactInfo
+- contact    : ContactInfo                    # Bright yellow, clickable → jumps to ContactInfo
 ```
 
 ### Relationship Legend Navigation

@@ -9,6 +9,157 @@ This document provides a systematic decision framework for AI systems to convert
 - [Database Types and Mappings](./02_DATABASE_TYPES_AND_MAPPINGS.md) - Type conversion reference
 - [Embedded Entities and Templates](./03_EMBEDDED_ENTITIES_AND_TEMPLATES.md) - Entity structure patterns
 
+## AI Processing Workflow
+
+### Step 0: Generate Schema Architecture Overview (MANDATORY)
+
+**Before processing any entities, AI systems MUST analyze the complete schema and generate a comprehensive architecture overview.**
+
+#### Architecture Analysis Algorithm
+
+```python
+def generate_architecture_overview(schema_data):
+    overview = {
+        'database_purpose': analyze_system_purpose(schema_data),
+        'domain': determine_business_domain(schema_data), 
+        'architecture_pattern': identify_architectural_pattern(schema_data),
+        'module_breakdown': analyze_module_structure(schema_data),
+        'key_features': identify_architectural_features(schema_data)
+    }
+    return format_architecture_comments(overview)
+
+def analyze_module_structure(schema_data):
+    modules = {}
+    for module in schema_data.modules:
+        entity_count = len(module.entities)
+        field_count = sum(len(entity.fields) for entity in module.entities)
+        modules[module.name] = {
+            'entities': entity_count,
+            'fields': field_count,
+            'description': infer_module_purpose(module)
+        }
+    return modules
+
+def identify_architectural_features(schema_data):
+    features = []
+    
+    # Security patterns
+    if has_encrypted_fields(schema_data):
+        features.append("Security: PII protection and field encryption")
+    if has_audit_trails(schema_data):
+        features.append("Comprehensive audit trails with system timestamps")
+        
+    # Scalability patterns  
+    if has_partitioning(schema_data):
+        features.append("Scalability: Partitioning and performance optimization")
+    if has_soft_deletes(schema_data):
+        features.append("Data patterns: Soft delete with IsDeleted flags")
+        
+    # Architecture patterns
+    if has_multi_tenant_structure(schema_data):
+        features.append("Multi-tenant architecture with Account segregation")
+    if has_spatial_indexing(schema_data):
+        features.append("Spatial indexing for geographic data")
+        
+    return features
+
+def analyze_data_distribution(schema_data):
+    type_counts = {}
+    total_fields = 0
+    total_entities = len(schema_data.all_entities)
+    
+    for module in schema_data.modules:
+        for entity in module.entities:
+            for field in entity.fields:
+                field_type = normalize_field_type(field.data_type)
+                type_counts[field_type] = type_counts.get(field_type, 0) + 1
+                total_fields += 1
+    
+    # Generate intelligent insights rather than mechanical lists
+    return generate_intelligent_distribution_summary(type_counts, total_fields, total_entities)
+
+def generate_intelligent_distribution_summary(type_counts, total_fields, total_entities):
+    sorted_types = sorted(type_counts.items(), key=lambda x: x[1], reverse=True)
+    
+    summary_lines = []
+    summary_lines.append(f"{total_fields} total fields across {total_entities} entities")
+    
+    # Identify dominant pattern
+    if sorted_types:
+        dominant_type, dominant_count = sorted_types[0]
+        dominant_pct = (dominant_count / total_fields) * 100
+        dominant_pattern = get_schema_characteristic(dominant_type, dominant_pct)
+        summary_lines.append(f"{dominant_pattern} ({dominant_count} {dominant_type} fields, {dominant_pct:.1f}%)")
+    
+    # Identify secondary patterns with business insights
+    for type_name, count in sorted_types[1:3]:  # Top 2-3 secondary patterns
+        percentage = (count / total_fields) * 100
+        if percentage >= 10:  # Only include significant patterns
+            insight = get_business_insight(type_name, count, percentage)
+            summary_lines.append(f"{insight} ({count} {type_name} fields, {percentage:.1f}%)")
+    
+    return summary_lines
+
+def get_schema_characteristic(data_type, percentage):
+    characteristics = {
+        'String': f"String-heavy schema" if percentage > 35 else "String-focused schema",
+        'Int': f"Logic-intensive schema" if percentage > 25 else "Business logic emphasis", 
+        'DateTime': f"Time-critical schema" if percentage > 20 else "Temporal data focus",
+        'Boolean': f"State-driven schema" if percentage > 15 else "Status-oriented schema",
+        'Decimal': f"Financial-precision schema" if percentage > 20 else "Numeric precision focus"
+    }
+    return characteristics.get(data_type, f"{data_type}-dominant schema")
+
+def get_business_insight(data_type, count, percentage):
+    insights = {
+        'String': "Content and identifier focus",
+        'Int': "Extensive business logic",
+        'DateTime': "Rich temporal data", 
+        'Boolean': "Feature flag intensive",
+        'Decimal': "Financial precision emphasis",
+        'Double': "Geographic/metric calculations",
+        'Text': "Documentation-heavy design",
+        'JSON': "Flexible configuration approach",
+        'Binary': "Media/file storage capabilities"
+    }
+    return insights.get(data_type, f"Specialized {data_type} usage")
+```
+
+#### Architecture Overview Output Format
+
+```dbsoup
+@filename.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: [Inferred system purpose from entity analysis]
+# Domain: [Business domain classification]
+# Architecture Pattern: [Identified pattern - microservice, monolith, etc.]
+# 
+# == MODULE BREAKDOWN ==
+# [Module Name] ([X] entities, [Y] fields)
+#   - [Inferred purpose and key responsibilities]
+# [Additional modules...]
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - [Security implementations identified]
+# - [Scalability patterns found]
+# - [Data management strategies detected]
+# - [Integration capabilities discovered]
+# - [Compliance features identified]
+#
+# == DATA DISTRIBUTION ==
+# [X] total fields across [Y] entities
+# [Intelligent primary characteristic] ([count] [type] fields, [%])
+# [Business insight for secondary pattern] ([count] [type] fields, [%])
+# [Additional significant patterns with business context...]
+```
+
+**Critical Success Factors:**
+- **Completeness**: Analyze ALL modules and entities before generating overview
+- **Accuracy**: Base descriptions on actual field analysis, not assumptions
+- **Consistency**: Use standard terminology and patterns across projects
+- **Business Focus**: Translate technical patterns into business value
+
 ## Quick Start AI Decision Framework
 
 ### Step 1: Pattern Recognition and Field Prefix Decision

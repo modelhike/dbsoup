@@ -14,25 +14,59 @@ DBSoup is designed as a database-as-code format, bringing modern software develo
 - **Documentation Generation:** Auto-generate API docs and ERD diagrams
 - **Test Environment Setup:** Use DBSoup files to create test databases
 
-### 1.2 Workflow Example
+### 1.2 Complete Document Structure
+
+**Every DBSoup file should follow this recommended structure:**
+
+```dbsoup
+@filename.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: [Brief description of system purpose]
+# Domain: [Business domain - e.g., E-commerce, Logistics, CRM]
+# Architecture Pattern: [Microservice, Monolith, Domain-driven, etc.]
+# 
+# == MODULE BREAKDOWN ==
+# Core Entities (X entities, Y fields)
+#   - Brief description of core business entities
+# Authentication (X entities, Y fields) 
+#   - User management and security systems
+# [Additional modules...]
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - Multi-tenant architecture with Account segregation
+# - Soft delete patterns with IsDeleted flags  
+# - Comprehensive audit trails with timestamp tracking
+# - Spatial indexing for geographic data
+# - Security: PII protection and field encryption
+# - Scalability: Partitioning and performance optimization
+#
+# == DATA DISTRIBUTION ==
+# [X] total fields across [Y] entities
+# [Primary pattern description] ([dominant type] fields, [%])
+# [Secondary pattern description] ([secondary type] fields, [%])
+# [Business insight] ([business-relevant type] fields for [purpose])
+
+=== RELATIONSHIP DEFINITIONS ===
+[Relationship declarations...]
+
+=== DATABASE SCHEMA ===
+[Module and entity definitions...]
+```
+
+### 1.3 Workflow Example
 
 ```bash
 # 1. Create a feature branch for schema changes
 git checkout -b feature/add-user-preferences
 
-# 2. Edit the schema file (user.dbsoup)
-User
-====
-* _id           : UUID                      [PK]
-* ! username    : String(50)                [UK,IX]
-+ preferences   : UserPreference
+# 2. Edit the schema file (user.dbsoup) - including architecture overview
+@user.dbsoup
 
-UserPreference
-/=============/
-* _id           : UUID                      [PK]
-* user_id       : UUID                      [FK:User._id]
-- theme         : String                    [DEFAULT:'light']
-- notifications : Boolean                   [DEFAULT:true]
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: User management and personalization system
+# Domain: User Experience Management
+# Architecture Pattern: Domain-driven design with CQRS
 
 # 3. Validate schema changes
 dbsoup lint user.dbsoup

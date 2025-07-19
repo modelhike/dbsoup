@@ -258,8 +258,8 @@ class DBSoupCLI {
     }
     
     private func generateSVG(_ filePath: String, outputPath: String?) throws {
-        let document = try loadAndParseFile(filePath)
-        let svgGenerator = DBSoupSVGGenerator(document: document)
+        let (document, rawContent) = try loadAndParseFileWithContent(filePath)
+        let svgGenerator = DBSoupSVGGenerator(document: document, rawContent: rawContent)
         let svg = svgGenerator.generateSVG()
         
         if let outputPath = outputPath {
@@ -323,6 +323,32 @@ class DBSoupCLI {
         let parser = DBSoupParser(content: content)
         do {
             return try parser.parse()
+        } catch let parseError as DBSoupParseError {
+            throw CLIError.parseError(parseError.localizedDescription)
+        } catch {
+            throw CLIError.parseError("Unknown parse error: \(error)")
+        }
+    }
+    
+    private func loadAndParseFileWithContent(_ filePath: String) throws -> (DBSoupDocument, String) {
+        // Check if file exists
+        guard FileManager.default.fileExists(atPath: filePath) else {
+            throw CLIError.fileNotFound(filePath)
+        }
+        
+        // Read file content
+        let content: String
+        do {
+            content = try String(contentsOfFile: filePath, encoding: .utf8)
+        } catch {
+            throw CLIError.fileNotFound("Could not read file: \(filePath)")
+        }
+        
+        // Parse the content
+        let parser = DBSoupParser(content: content)
+        do {
+            let document = try parser.parse()
+            return (document, content)
         } catch let parseError as DBSoupParseError {
             throw CLIError.parseError(parseError.localizedDescription)
         } catch {

@@ -56,8 +56,47 @@ _ updated_at : DateTime [SYSTEM]
 ### Basic Pattern Recognition
 Refer to [DBSOUP_SPECIFICATIONS.md](./DBSOUP_SPECIFICATIONS.md) for complete syntax specifications. Here's a quick overview of what to look for:
 
+#### Schema Architecture Overview Section
+**MANDATORY**: Before any technical definitions, include a comprehensive architecture overview as structured comments:
+
+```dbsoup
+@filename.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: [One-line description of system purpose]
+# Domain: [Business domain - e.g., E-commerce, Logistics, CRM, Healthcare]
+# Architecture Pattern: [Microservice, Monolith, Domain-driven, Event-sourced, etc.]
+# 
+# == MODULE BREAKDOWN ==
+# Core Entities (X entities, Y fields)
+#   - [Brief description focusing on primary business entities]
+# Authentication (X entities, Y fields) 
+#   - [Security and user management systems]
+# Business Logic (X entities, Y fields)
+#   - [Domain-specific processing and workflows]
+# Audit (X entities, Y fields)
+#   - [Logging, tracking, and compliance systems]
+# Configuration (X entities, Y fields)
+#   - [System settings and preferences]
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - [Security implementation: PII protection, encryption patterns]
+# - [Scalability features: partitioning, indexing strategies]
+# - [Data patterns: soft deletes, audit trails, versioning]
+# - [Integration: API authentication, external service connections]
+# - [Compliance: GDPR, audit requirements, data retention]
+#
+# == DATA DISTRIBUTION ==
+# [X] total fields across [Y] entities
+# [Dominant characteristic] ([primary type] fields, [%])
+# [Secondary characteristic] ([secondary type] fields, [%])
+# [Business pattern insight] ([business type] fields for [purpose])
+```
+
+**Purpose**: This overview enables stakeholders to understand the system at a glance before diving into technical details. The data distribution section reveals the schema's composition and primary data patterns.
+
 #### Relationship Definition Section
-Before documenting individual entities, create a global relationship definitions section:
+After the architecture overview, create a global relationship definitions section:
 
 ```dbsoup
 === RELATIONSHIP DEFINITIONS ===

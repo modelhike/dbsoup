@@ -105,7 +105,11 @@ Order
 * id           : UUID                       [PK,AUTO]
 @ order_no     : String(32)                 [UK,IX]
 - customer_id  : UUID                       [FK:Customer.id]
+# payment_token : String(255)               [ENCRYPTED]
+~ credit_card  : String(19)                 [MASK:XXXX-XXXX-XXXX-####]
+> tenant_id    : UUID                       [PARTITION:hash]
 - created_at   : DateTime                   [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]
+$ audit_trail  : JSON                       [AUDIT:full]
 - total_amount : Decimal(10,2)              [COMPUTED:price*quantity]
 ```
 
@@ -114,6 +118,126 @@ Legend:
 - `@` → **Indexed** field  
 - `-` → **Optional** field  
 - `#` → **Sensitive** (encrypted/PII) field
+- `~` → **Masked** field (data masking patterns)
+- `>` → **Partitioned** field (sharding/partitioning keys)
+- `$` → **Audit** field (compliance logging)
+
+### Multi-Dimensional Information
+
+Each prefix conveys **multiple layers of meaning** that inform different stakeholders:
+
+- **Data Requirements** (required vs optional) - What's essential vs supplementary
+- **Performance Characteristics** (indexed, partitioned) - How data is optimized for access
+- **Security Posture** (sensitive, masked, audit) - What needs protection or tracking  
+- **Business Criticality** (primary vs supplementary) - Core business data vs metadata
+
+This semantic richness enables automated compliance checking, performance optimization, and security auditing directly from the schema definition.
+
+### Core Prefixes
+
+| Prefix | Semantic Meaning | Technical Purpose | Business Impact |
+|--------|------------------|-------------------|------------------|
+| `*` | **Required/Primary** | Cannot be null, essential to entity | Core business data |
+| `-` | **Optional** | Nullable, supplementary | Nice-to-have data |
+| `!` | **Indexed** | Performance-critical lookup | Query optimization |
+| `@` | **Sensitive/Encrypted** | PII or encrypted data | Security/compliance |
+| `~` | **Masked** | Data masking patterns | Privacy protection |
+| `>` | **Partitioned** | Sharding/partitioning keys | Scalability strategy |
+| `$` | **Audit** | Compliance logging | Regulatory tracking |
+
+## Why This Prefix System Matters
+
+### 1. Immediate Visual Scanning
+
+The prefix system enables **at-a-glance comprehension** of complex schemas:
+
+```dbsoup
+User
+==========
+* user_id      : UUID                       [PK]           # Primary - can't be null
+@ email        : String(255)                [UK,PII]       # Sensitive - needs encryption
+! username     : String(50)                 [IX]           # Indexed - fast lookups
+- phone        : String(20)                                # Optional - can be null
+~ ssn          : String(11)                 [MASK:XXX-XX-####] # Masked - privacy
+> tenant_id    : UUID                       [PARTITION:hash]   # Partitioned - scalability
+$ audit_log    : JSON                       [AUDIT:full]       # Audit - compliance
+```
+
+Each field's **business purpose**, **technical requirements**, and **governance needs** are immediately visible.
+
+### 2. Compliance & Governance
+
+The prefixes enable **automated compliance** by making sensitive data immediately identifiable:
+
+```dbsoup
+Customer
+==========
+* id           : UUID           [PK,AUTO:uuid()]
+@ email        : String(255)    [PII,ENCRYPTED,UK]        # GDPR-relevant
+@ full_name    : String(100)    [PII]                     # GDPR-relevant  
+~ credit_card  : String(19)     [PII,MASK:XXXX-XXXX-XXXX-####] # PCI-DSS
+$ access_log   : JSON           [AUDIT:gdpr_required]     # Compliance tracking
+- preferences  : JSON                                     # Non-sensitive
+```
+
+Automated tools can immediately identify:
+- **PII fields** for GDPR compliance (`@` + `[PII]`)
+- **Sensitive financial data** for PCI-DSS (`~` + masking patterns)
+- **Audit requirements** for SOC-2 compliance (`$` + `[AUDIT]`)
+
+### 3. Performance Planning
+
+Operational characteristics are **visually obvious** for database optimization:
+
+```dbsoup
+OrderMetrics
+==========
+! order_id     : UUID           [IX:clustered,FK:Order.id]     # High-performance lookup
+! customer_id  : UUID           [IX:btree]                     # Frequent joins
+> region_code  : String(10)     [PARTITION:range]             # Horizontal scaling
+@ created_date : Date           [IX:btree,AUDIT]              # Time-series queries
+- metadata     : JSON                                         # Flexible storage
+```
+
+Database architects can instantly see:
+- **Query optimization** strategy (`!` for indexes)
+- **Scaling patterns** (`>` for partitioning)
+- **Access patterns** (clustered vs standard indexes)
+
+### 4. Integration with Constraint Annotations
+
+The prefixes work **in combination** with bracket annotations `[...]` to provide complete field semantics:
+
+```dbsoup
+Account
+==========
+* id           : UUID           [PK,AUTO:uuid()]                    # Primary + auto-generated
+@ email        : String(255)    [UK,PII,IX,ENCRYPTED:aes256]       # Sensitive + unique + indexed  
+! account_no   : String(20)     [IX:btree,GENERATED:sequence]      # Indexed + generated sequence
+- phone        : String(20)     [MASK:XXX-XXX-####]               # Optional + masked
+> shard_key    : String(10)     [PARTITION:range,FK:Region.id]     # Partitioned + foreign key
+$ created_at   : DateTime       [AUDIT,SYSTEM,DEFAULT:CURRENT_TIMESTAMP] # Audit + system-generated
+```
+
+This dual-layer approach provides:
+- **Visual semantics** through prefixes (quick scanning)
+- **Technical precision** through annotations (automation-ready)
+
+### 5. Visual Design Philosophy  
+
+The prefix system follows **intuitive visual hierarchy principles**:
+
+| Prefix | Visual Metaphor | Business Meaning | Technical Implication |
+|--------|----------------|------------------|----------------------|
+| `*` | "Star/Important" | Critical business data | Cannot be null |
+| `@` | "Address/Identity" | Personal/sensitive data | Needs encryption/indexing |  
+| `!` | "Attention/Alert" | Performance-critical | Database index required |
+| `-` | "Optional/Dash" | Supplementary data | Nullable field |
+| `~` | "Approximate/Wave" | Hidden/obfuscated | Data masking applied |
+| `>` | "Arrow/Direction" | Distribution key | Partitioning/sharding |
+| `$` | "Value/Money" | Valuable for tracking | Audit trail required |
+
+This makes DBSoup schemas **scannable at a glance** while maintaining precise technical meaning for automated tools.
 
 System-generated or computed fields are indicated by the `[SYSTEM]`, `[AUTO]`, or `[COMPUTED:expr]` attributes inside the brackets rather than by a separate prefix.
 

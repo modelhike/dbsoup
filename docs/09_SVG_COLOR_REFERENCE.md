@@ -3,6 +3,15 @@
 ## Overview
 This guide provides a complete reference for all color codes used in DBSoup SVG diagrams, including field types, entity styles, and embedded entity highlighting.
 
+## ✨ Color Consistency Update (v2.0)
+**Important**: As of the latest update, **embedded entity fields now use the same colors as standard entity fields** for better visual consistency. This eliminates the previous purple-tinted color scheme for embedded entities, making the diagram easier to read and understand.
+
+**Key Changes:**
+- Optional fields (`-` prefix) are now **gray** in both standard and embedded entities (was purple in embedded entities)
+- Required fields (`*` prefix) use the **same orange** shade in both entity types
+- **Embedded entity references** now use **consistent bright yellow** regardless of context (was darker yellow for embedded→embedded references)
+- All field types maintain consistent colors regardless of entity type
+
 ## Entity Type Colors
 
 ### Standard Entities
@@ -39,21 +48,22 @@ This guide provides a complete reference for all color codes used in DBSoup SVG 
 ### Embedded Entity Fields
 | Field Type | Color | Hex Code | Usage |
 |------------|-------|----------|-------|
-| **Required** | Orange | `#e67e22` | Fields with `*` prefix (darker than standard) |
-| **Optional** | Purple | `#a569bd` | Fields with `-` prefix |
-| **Indexed** | Purple | `#8e44ad` | Fields with `!` prefix |
-| **Sensitive** | Red | `#e74c3c` | Fields with `@` prefix |
-| **Foreign Key** | Light Purple | `#c39bd3` | Fields with `[FK:...]` constraint **[Clickable]** |
-| **🆕 Embedded Entity Reference** | **Darker Yellow** | `#fdd835` | Embedded entity fields referencing embedded entities **[Clickable]** |
+| **Required** | Orange | `#ffa502` | Fields with `*` prefix (same as standard) |
+| **Optional** | Gray | `#c7c7c7` | Fields with `-` prefix (same as standard) |
+| **Indexed** | Blue | `#5352ed` | Fields with `!` prefix (same as standard) |
+| **Sensitive** | Red | `#ff4757` | Fields with `@` prefix (same as standard) |
+| **Foreign Key** | Purple | `#e056fd` | Fields with `[FK:...]` constraint **[Clickable]** (same as standard) |
+| **🆕 Embedded Entity Reference** | **Bright Yellow** | `#ffeb3b` | Embedded entity fields referencing embedded entities **[Clickable]** (same as standard) |
 
 ## Embedded Entity Reference Color Logic
-- **Bright Yellow (#ffeb3b)**: When a **standard entity** field references an embedded entity
-- **Darker Yellow (#fdd835)**: When an **embedded entity** field references another embedded entity
+- **Bright Yellow (#ffeb3b)**: All embedded entity references use the same bright yellow color for consistency
+  - Standard entity → embedded entity references  
+  - Embedded entity → embedded entity references
 
 ## Color Priority System
 When multiple attributes apply to a field, colors are assigned in this priority order:
 
-1. **Embedded Entity Reference** (Bright/Darker Yellow) - Highest priority
+1. **Embedded Entity Reference** (Bright Yellow) - Highest priority
 2. **Foreign Key** (Purple)
 3. **Sensitive** (Red)
 4. **Required** (Orange)
@@ -78,18 +88,19 @@ User
 ```
 Address
 /=======/
-* _id        : ObjectId     [PK]           # Orange (required, darker shade)
-- street     : String                      # Purple (optional)
-! city       : String       [IX]           # Purple (indexed)
-- contact    : ContactInfo                 # ✨ Darker Yellow (#fdd835) - embedded entity → embedded entity
+* _id        : ObjectId     [PK]           # Orange (required, same shade as standard)
+- street     : String                      # Gray (optional, same as standard)
+! city       : String       [IX]           # Blue (indexed, same as standard)
+- contact    : ContactInfo                 # ✨ Bright Yellow (#ffeb3b) - embedded entity → embedded entity (same as standard)
 ```
 
 ## Usage Guidelines
 
 ### When Colors Are Applied
 - **Embedded Entity Reference**: Automatically detected when field type matches an embedded entity name
-  - **Bright Yellow**: Standard entity field → embedded entity (e.g., `User.address: Address`)
-  - **Darker Yellow**: Embedded entity field → embedded entity (e.g., `Address.contact: ContactInfo`)
+  - **Bright Yellow**: All embedded entity references use consistent bright yellow color
+    - Standard entity field → embedded entity (e.g., `User.address: Address`)
+    - Embedded entity field → embedded entity (e.g., `Address.contact: ContactInfo`)
   - **Interactive**: Embedded entity fields are clickable hyperlinks that navigate to referenced entities
   - **Format Detection**: Automatically analyzes field data type to create `<a href="#EntityName">` links
 - **Foreign Key**: When field has `[FK:Entity.field]` constraint
@@ -103,9 +114,8 @@ Address
 ### Color Accessibility
 - All colors have sufficient contrast against dark backgrounds
 - Yellow highlighting ensures embedded entity references are immediately visible
-  - Bright yellow (#ffeb3b) for standard entity → embedded entity references
-  - Darker yellow (#fdd835) for embedded entity → embedded entity references
-- Purple tinting for embedded entities maintains visual hierarchy
+  - Consistent bright yellow (#ffeb3b) for all embedded entity references
+- Consistent coloring across all entity types maintains clear visual hierarchy
 - **Relationship legend has dark background** that's visible on any background color
 - **High contrast text** with shadows ensures readability on all backgrounds
 - Consistent color scheme across all entity types
@@ -155,13 +165,22 @@ Address
 * _id        : ObjectId     [PK]              # Entity has id="Address" for navigation
 - street     : String
 - city       : String
-- contact    : ContactInfo                    # Darker yellow, clickable → jumps to ContactInfo
+- contact    : ContactInfo                    # Bright yellow, clickable → jumps to ContactInfo
 ```
 
 ## Implementation Notes
 - Colors are defined in SVG CSS classes for easy customization
-- Standard and embedded entities have separate color schemes
-- Embedded entity field detection includes cross-reference validation
+- **Field colors are now consistent** across standard and embedded entities for improved readability
+- **Entity box styling remains distinct** (embedded entities keep their purple-themed borders and headers for visual differentiation)
+
+## Migration Summary (v2.0)
+The color consistency update ensures that field meanings are immediately clear regardless of entity type:
+
+**Before**: Embedded entities used purple-tinted colors that differed from standard entities
+**After**: All field types use identical colors in both standard and embedded entities
+
+This change improves diagram readability and eliminates confusion about field semantics based on entity type.
+- Embedded entity field detection includes cross-reference validation for accurate hyperlink generation
 - Colors are applied through CSS classes in the generated SVG output
 - **SVG is fully zoomable** - includes width/height attributes + viewBox + preserveAspectRatio
 - **Scalable CSS** ensures proper zooming behavior in all browsers

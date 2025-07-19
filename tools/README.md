@@ -717,13 +717,13 @@ $ dbsoup svg roadwarrior.dbsoup --output diagram.svg
     - Foreign Key: Purple (#e056fd) **[Clickable Links]**
     - **Embedded Entity Reference: Bright Yellow (#ffeb3b) [Clickable Links]**
     
-    **Embedded Entity Fields:**
-    - Required: Orange (#e67e22)
-    - Optional: Purple (#a569bd)
-    - Indexed: Purple (#8e44ad)
-    - Sensitive: Red (#e74c3c)
-    - Foreign Key: Light Purple (#c39bd3) **[Clickable Links]**
-    - **Embedded Entity Reference: Darker Yellow (#fdd835) [Clickable Links]**
+    **Embedded Entity Fields (Consistent with Standard):**
+    - Required: Orange (#ffa502) - same as standard
+    - Optional: Gray (#c7c7c7) - same as standard  
+    - Indexed: Blue (#5352ed) - same as standard
+    - Sensitive: Red (#ff4757) - same as standard
+    - Foreign Key: Purple (#e056fd) **[Clickable Links]** - same as standard
+    - **Embedded Entity Reference: Bright Yellow (#ffeb3b) [Clickable Links]** - same as standard
   • Relationship lines with cardinality indicators
   • Module grouping with headers
   • Curved relationship connections
@@ -897,9 +897,10 @@ class DBSoupSVGGenerator {
 - Color-coded field types for easy identification
   - Standard entity fields: Orange/gray/blue/red/purple color scheme
   - Embedded entity fields: Purple-tinted color scheme with italic styling
-  - **Embedded entity references: Bright yellow highlighting**
-    - Bright yellow: Standard entity → embedded entity
-    - Darker yellow: Embedded entity → embedded entity
+  - **Embedded entity references: Consistent bright yellow highlighting**
+    - Bright yellow: All embedded entity references use the same color for consistency
+      - Standard entity → embedded entity
+      - Embedded entity → embedded entity
 - **Interactive foreign key links** that navigate to referenced entities
 - **Interactive embedded entity links** that navigate to embedded entities
 - **Interactive relationship legend** that shows all schema relationships

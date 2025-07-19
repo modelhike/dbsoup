@@ -9,6 +9,139 @@ This document provides comprehensive guidance on embedded entities, templates, a
 - [Database Types and Mappings](./02_DATABASE_TYPES_AND_MAPPINGS.md) - Type conversion reference
 - [AI Decision Framework](./04_AI_DECISION_FRAMEWORK.md) - Decision logic for AI systems
 
+## Complete DBSoup Document Template
+
+### Standard Document Structure
+
+Every DBSoup file should include a comprehensive architecture overview before technical definitions:
+
+```dbsoup
+@systemname.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: Comprehensive logistics and route optimization platform
+# Domain: Transportation & Logistics Management
+# Architecture Pattern: Domain-driven design with multi-tenant architecture
+# 
+# == MODULE BREAKDOWN ==
+# Core Entities (4 entities, 95 fields)
+#   - Account, User, Org, Member - Multi-tenant user management
+# Routes (5 entities, 117 fields) 
+#   - Route, Site, Schedule, Stop, StopAddOn - Route planning and optimization
+# Authentication (3 entities, 37 fields)
+#   - RefreshTokens, ApiAuth, FedExAuth - Security and API integration
+# Logistics (4 entities, 52 fields)
+#   - Purchases, PurchaseLog, Stats, History - Business transactions and analytics  
+# Audit (3 entities, 31 fields)
+#   - Log, UserNote, UserNoteLog - Comprehensive audit trails
+# Configuration (4 entities, 46 fields)
+#   - Config, UserPref, BlobInfo, Install - System configuration and file management
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - Multi-tenant architecture with Account-based segregation
+# - Comprehensive security with encrypted fields and PII protection
+# - Soft delete patterns with IsDeleted flags across all entities
+# - Audit trails with system-generated timestamps (CD/LU)
+# - Spatial indexing for geographic route optimization
+# - Performance optimization with strategic indexing and partitioning
+# - Integration support for external APIs (FedEx, payment systems)
+# - Mobile-first design with offline synchronization capabilities
+#
+# == DATA DISTRIBUTION ==
+# 399 total fields across 23 entities
+# String-heavy schema (155 string fields, 38.8%)
+# Rich temporal data (65 DateTime fields, 16.3%)
+# Extensive business logic (85 Int fields for enums/flags)
+
+=== RELATIONSHIP DEFINITIONS ===
+# One-to-Many Relationships  
+Account -> User [1:M] (composition)
+User -> Route [1:M] (composition)
+Route -> Stop [1:M] (composition)
+
+# Many-to-Many Relationships
+User -> Account [M:N] (association) via Member
+
+=== DATABASE SCHEMA ===
++ Core
++ Routes  
++ Authentication
++ Logistics
++ Audit
++ Configuration
+
+=== Core ===
+[Entity definitions...]
+```
+
+### Architecture Overview Template Patterns
+
+#### E-commerce System Example
+```dbsoup  
+@ecommerce.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: Multi-vendor e-commerce platform with inventory management
+# Domain: E-commerce & Retail
+# Architecture Pattern: Microservices with event sourcing
+#
+# == MODULE BREAKDOWN ==
+# Core (5 entities, 80 fields)
+#   - User, Vendor, Product, Category, Brand - Core business entities
+# Orders (4 entities, 65 fields)
+#   - Order, OrderItem, Payment, Shipping - Transaction processing
+# Inventory (3 entities, 45 fields) 
+#   - Inventory, Stock, Warehouse - Stock management
+# Reviews (2 entities, 25 fields)
+#   - Review, Rating - Customer feedback system
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - Event sourcing for order processing and inventory updates
+# - Multi-vendor support with vendor-specific product catalogs
+# - Real-time inventory synchronization across warehouses
+# - Advanced search with Elasticsearch integration
+# - Payment processing with PCI-DSS compliance
+# - Mobile-responsive design with PWA capabilities
+#
+# == DATA DISTRIBUTION ==
+# 214 total fields across 14 entities
+# Content-focused schema (125 string fields, 58.4%)
+# Financial precision emphasis (35 Decimal fields, 16.4%)
+# Moderate business logic (25 Int fields for status/quantities)
+```
+
+#### Healthcare System Example  
+```dbsoup
+@healthcare.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: Electronic Health Records (EHR) system with patient management
+# Domain: Healthcare & Medical Records
+# Architecture Pattern: HIPAA-compliant microservices with blockchain audit
+#
+# == MODULE BREAKDOWN ==  
+# Patient (6 entities, 120 fields)
+#   - Patient, MedicalHistory, Insurance, Emergency - Patient demographics
+# Clinical (8 entities, 200 fields)
+#   - Appointment, Visit, Diagnosis, Treatment - Clinical workflows
+# Security (4 entities, 50 fields)
+#   - AuditLog, AccessControl, Consent, Encryption - HIPAA compliance
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - HIPAA compliance with comprehensive audit trails
+# - End-to-end encryption for all PHI (Protected Health Information)
+# - Role-based access control with fine-grained permissions
+# - Blockchain-based audit trail for regulatory compliance
+# - Integration with HL7 FHIR standard for interoperability
+# - Zero-trust security model with multi-factor authentication
+#
+# == DATA DISTRIBUTION ==
+# 370 total fields across 18 entities
+# Documentation-heavy schema (245 string/text fields, 66.2%)
+# Time-critical operations (85 DateTime fields, 23.0%)
+# Consent and compliance focus (25 Boolean fields for permissions)
+```
+
 ## Embedded Entity Patterns
 
 ### 1. Entity Type Notations

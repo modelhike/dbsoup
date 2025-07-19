@@ -13,6 +13,54 @@ This checklist helps prevent the most common errors when converting database sch
 
 ## 🚨 CRITICAL ERROR PREVENTION
 
+### #0 Missing Architecture Overview (MANDATORY)
+
+❌ **ERROR: Starting DBSoup file without comprehensive architecture overview**
+```dbsoup
+@filename.dbsoup
+
+=== RELATIONSHIP DEFINITIONS ===  # WRONG - Missing architecture overview
+```
+
+✅ **CORRECT - Include architecture overview before any technical definitions:**
+```dbsoup
+@filename.dbsoup
+
+# === SCHEMA ARCHITECTURE OVERVIEW ===
+# Database Purpose: [System purpose and business domain]
+# Domain: [Business domain - e.g., E-commerce, Logistics, Healthcare] 
+# Architecture Pattern: [Technical architecture pattern]
+# 
+# == MODULE BREAKDOWN ==
+# [Module Name] ([X] entities, [Y] fields)
+#   - [Module purpose and key responsibilities]
+# [Additional modules...]
+#
+# == KEY ARCHITECTURAL FEATURES ==
+# - [Security implementations]
+# - [Scalability patterns]
+# - [Data management strategies]
+# - [Integration capabilities]
+# - [Compliance requirements]
+#
+# == DATA DISTRIBUTION ==
+# [X] total fields across [Y] entities
+# [Primary schema characteristic] ([dominant type] fields, [%])
+# [Secondary business insight] ([secondary type] fields, [%])
+# [Additional meaningful patterns...]
+
+=== RELATIONSHIP DEFINITIONS ===
+```
+
+**Rule:** Every DBSoup file MUST begin with a comprehensive architecture overview that provides business context and technical insights before diving into entity definitions.
+
+**Benefits:**
+- **Stakeholder Communication**: Enables business and technical stakeholders to understand system purpose immediately
+- **Documentation Quality**: Creates self-documenting schemas with architectural context
+- **Code Review Efficiency**: Reviewers understand system impact of schema changes
+- **AI Processing**: Provides context for automated tools and analysis
+- **Onboarding**: New team members can understand system architecture at a glance
+
 ### #1 Most Common Error: System Field Prefixes
 
 ❌ **NEVER USE `_` PREFIX FOR SYSTEM FIELDS**
