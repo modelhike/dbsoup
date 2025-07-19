@@ -2,14 +2,27 @@ import Foundation
 
 // MARK: - Data Structures
 
+/// YAML header with metadata
+public struct YAMLHeader {
+    public let specs: String?
+    public let version: String?
+    
+    public init(specs: String? = nil, version: String? = nil) {
+        self.specs = specs
+        self.version = version
+    }
+}
+
 /// Represents a parsed DBSoup document
 public struct DBSoupDocument {
+    public let yamlHeader: YAMLHeader?
     public let header: DBSoupHeader?
     public let relationshipDefinitions: RelationshipDefinitions?
     public let schemaDefinition: SchemaDefinition
     public let comments: [String]
     
-    public init(header: DBSoupHeader?, relationshipDefinitions: RelationshipDefinitions?, schemaDefinition: SchemaDefinition, comments: [String] = []) {
+    public init(yamlHeader: YAMLHeader? = nil, header: DBSoupHeader?, relationshipDefinitions: RelationshipDefinitions?, schemaDefinition: SchemaDefinition, comments: [String] = []) {
+        self.yamlHeader = yamlHeader
         self.header = header
         self.relationshipDefinitions = relationshipDefinitions
         self.schemaDefinition = schemaDefinition
@@ -361,11 +374,13 @@ public class DBSoupParser {
     }
     
     public func parse() throws -> DBSoupDocument {
+        let yamlHeader = try parseYAMLHeader()
         let header = try parseHeader()
         let relationshipDefinitions = try parseRelationshipDefinitions()
         let schemaDefinition = try parseSchemaDefinition()
         
         return DBSoupDocument(
+            yamlHeader: yamlHeader,
             header: header,
             relationshipDefinitions: relationshipDefinitions,
             schemaDefinition: schemaDefinition,
@@ -373,9 +388,43 @@ public class DBSoupParser {
         )
     }
     
+    // MARK: - YAML Header Parsing
+    
+    private func parseYAMLHeader() throws -> YAMLHeader? {
+        // Check if the document starts with YAML header markers
+        guard let firstLine = lexer.peekLine()?.trimmingCharacters(in: .whitespacesAndNewlines), 
+              firstLine == "---" else {
+            return nil // No YAML header present
+        }
+        
+        // Consume opening "---"
+        _ = lexer.nextLine()
+        
+        var specs: String? = nil
+        var version: String? = nil
+        
+        // Parse YAML content until closing "---"
+        while let line = lexer.nextLine() {
+            let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmedLine == "---" {
+                break // End of YAML header
+            }
+            
+            if trimmedLine.hasPrefix("@specs:") {
+                specs = String(trimmedLine.dropFirst(7)).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if trimmedLine.hasPrefix("@ver:") {
+                version = String(trimmedLine.dropFirst(5)).trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        
+        return YAMLHeader(specs: specs, version: version)
+    }
+    
     // MARK: - Header Parsing
     
     private func parseHeader() throws -> DBSoupHeader? {
+        lexer.skipEmptyLinesAndComments()
+        
         guard let line = lexer.peekLine(),
               line.trimmingCharacters(in: .whitespaces).starts(with: "@") else {
             return nil

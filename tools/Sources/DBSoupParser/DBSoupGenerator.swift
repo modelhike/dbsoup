@@ -45,11 +45,22 @@ public class DBSoupGenerator {
     public func generate(document: DBSoupDocument) -> String {
         output.removeAll()
         
+        generateYAMLHeader()
         generateHeader(document.header)
         generateRelationshipDefinitions(document.relationshipDefinitions)
         generateSchemaDefinition(document.schemaDefinition)
         
         return output.joined(separator: "\n")
+    }
+    
+    // MARK: - YAML Header Generation
+    
+    private func generateYAMLHeader() {
+        output.append("---")
+        output.append("@specs: https://www.dbsoup.com/SPECS.md")
+        output.append("@ver: 0.1")
+        output.append("---")
+        output.append("")
     }
     
     // MARK: - Header Generation

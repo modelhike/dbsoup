@@ -893,7 +893,7 @@ class DBSoupSVGGenerator {
 - **Alphabetical entity sorting** for easy scanning and navigation
 - **⚡ Instant hover tooltips** for foreign key and embedded entity fields (0.1s response time)
 - **Clickable foreign key navigation** with hyperlinks to referenced entities
-- **Clickable embedded entity navigation** with hyperlinks to embedded entities  
+- **Clickable embedded entity navigation** with hyperlinks to embedded entities
 - **Clickable relationship legend** with entity names linking to their definitions
 - **Entity IDs** for direct navigation (e.g., `#EntityName`)
 - Color-coded field types for easy identification

@@ -1,10 +1,49 @@
 # DBSoup Technical Specifications
 
-## 1. Database-as-Code
+## 1. File Format Structure
+
+### 1.1 YAML Header (Optional)
+
+Every DBSoup file can optionally start with a YAML header containing metadata:
+
+```dbsoup
+---
+@specs: https://www.dbsoup.com/SPECS.md
+@ver: 0.1
+---
+```
+
+#### YAML Header Fields
+
+- **@specs**: URL to the DBSoup specifications (for reference and validation)
+- **@ver**: Version of the DBSoup format being used (semantic versioning)
+
+The YAML header is parsed by DBSoup tools and the version is displayed in generated SVG diagrams.
+
+#### Version Display
+
+  When present, the version from the YAML header is displayed in the generated SVG diagram above the relationship legend box, formatted as "Db Schema v[version]".
+
+#### Version Display Customization
+
+The version label text can be customized using the `schemaVersionLabel` property:
+
+```swift
+// Default behavior
+DBSoupSVGGenerator.schemaVersionLabel = "Db Schema v"  // Default: "Db Schema v0.1"
+
+// Custom labels
+DBSoupSVGGenerator.schemaVersionLabel = "Database v"   // Displays: "Database v0.1"
+DBSoupSVGGenerator.schemaVersionLabel = "Schema "      // Displays: "Schema 0.1"  
+DBSoupSVGGenerator.schemaVersionLabel = "Version "     // Displays: "Version 0.1"
+DBSoupSVGGenerator.schemaVersionLabel = ""             // Displays: "0.1" (version only)
+```
+
+## 2. Database-as-Code
 
 DBSoup is designed as a database-as-code format, bringing modern software development practices to database schema management.
 
-### 1.1 Core Principles
+### 2.1 Core Principles
 
 - **Version Control Integration:** DBSoup files are plain text, making them perfect for Git-based version control
 - **Code Review Workflow:** Schema changes are reviewed through pull requests
@@ -14,11 +53,16 @@ DBSoup is designed as a database-as-code format, bringing modern software develo
 - **Documentation Generation:** Auto-generate API docs and ERD diagrams
 - **Test Environment Setup:** Use DBSoup files to create test databases
 
-### 1.2 Complete Document Structure
+### 2.2 Complete Document Structure
 
 **Every DBSoup file should follow this recommended structure:**
 
 ```dbsoup
+---
+@specs: https://www.dbsoup.com/SPECS.md
+@ver: 0.1
+---
+
 @filename.dbsoup
 
 # === SCHEMA ARCHITECTURE OVERVIEW ===

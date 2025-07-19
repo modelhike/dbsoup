@@ -7,7 +7,15 @@
   Author: Gemini
 *)
 
-dbsoup_document ::= header?, relationships_definition?, schema_definition, { comment };
+dbsoup_document ::= yaml_header?, header?, relationships_definition?, schema_definition, { comment };
+
+yaml_header ::= "---", NEWLINE, { yaml_field }, "---", NEWLINE;
+
+yaml_field ::= yaml_key, ":", yaml_value, NEWLINE;
+
+yaml_key ::= "@specs" | "@ver";
+
+yaml_value ::= [ " " ], ( url | version_string | string );
 
 header ::= "@", identifier, ".dbsoup", NEWLINE;
 
@@ -86,6 +94,8 @@ literal ::= string | number;
 string ::= "'", {? any character except "'" ?}, "'" |
            '"', {? any character except '"' ?}, '"';
 number ::= DIGIT, { DIGIT };
+url ::= "https://", {? any character except whitespace ?};
+version_string ::= DIGIT, ".", DIGIT, { ".", DIGIT };
 
 text_until_newline ::= {? any character except NEWLINE ?};
 text_until_bracket_or_comma ::= {? any character except "]" or "," ?};

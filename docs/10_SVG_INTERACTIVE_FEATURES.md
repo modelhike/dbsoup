@@ -484,7 +484,7 @@ Profile
 * _id        : ObjectId     [PK]              # Entity has id="Profile" for navigation
 - settings   : UserSettings                   # Yellow: hover="UserSettings" tooltip
 
-# Target embedded entity with ID  
+# Target embedded entity with ID
 Address
 /======/
 * _id        : ObjectId     [PK]              # Entity has id="Address" for navigation
