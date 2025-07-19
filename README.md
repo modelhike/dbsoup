@@ -335,7 +335,7 @@ To get started with DBSoup, refer to the following documents based on your needs
 | 🚀 **[Extras & Advanced Guide](docs/DATABASE_SCHEMA_TO_DBSOUP_EXTRAS.md)** | **Specialists & AI** | Covers less-common database engines (e.g., Snowflake, Neo4j), advanced enterprise patterns, versioning, and tooling strategies. Check here if the main guide doesn't cover your specific use case. |
 | 📐 **[Technical Specifications](docs/DBSOUP_SPECIFICATIONS.md)** | **Developers & AI** | Complete technical specifications including syntax, validation rules, and tooling integration. |
 | 🔗 **[Relationships Example](docs/DBSOUP_RELATIONSHIPS_EXAMPLE.md)** | **Developers & AI** | Comprehensive examples of complex relationship modeling patterns including one-to-many, many-to-many, inheritance, and junction tables. |
-| 🎨 **[SVG Interactive Features](docs/10_SVG_INTERACTIVE_FEATURES.md)** | **Developers & AI** | Guide to interactive SVG features including alphabetical sorting, clickable foreign key navigation, and enhanced visual styling. |
+| 🎨 **[SVG Interactive Features](docs/10_SVG_INTERACTIVE_FEATURES.md)** | **Developers & AI** | Guide to interactive SVG features including **instant hover tooltips**, **module-based organization with descriptions**, clickable foreign key navigation, and enhanced visual styling. |
 | 🌈 **[SVG Color Reference](docs/09_SVG_COLOR_REFERENCE.md)** | **Developers & AI** | Complete color reference for SVG diagrams including field types, entity styles, and embedded entity highlighting. |
 | 🔧 **[Formal Grammar](docs/DBSOUP_GRAMMAR.ebnf)** | **Tool Builders & AI** | The strict, formal EBNF grammar for the DBSoup language. Use this to build linters, validators, parsers, or any other automated tooling. |
 

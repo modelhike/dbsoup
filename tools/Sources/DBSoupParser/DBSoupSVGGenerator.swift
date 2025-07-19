@@ -54,12 +54,13 @@ public class DBSoupSVGGenerator {
     }
     
     public func generateSVG() -> String {
-        let allEntities = getAllEntities()
+        let _ = getAllEntities() // Keep for backward compatibility
+        let entitiesByModule = getEntitiesByModule()
         let allRelationships = getAllRelationships()
         let architecturalOverview = extractArchitecturalOverview()
         
         // Calculate layout with dynamic sizing, legend space, and architectural overview
-        let layout = calculateDynamicLayout(entities: allEntities, relationships: allRelationships, architecturalOverview: architecturalOverview)
+        let layout = calculateModularLayout(entitiesByModule: entitiesByModule, relationships: allRelationships, architecturalOverview: architecturalOverview)
         
         var svg = """
         <svg xmlns="http://www.w3.org/2000/svg" 
@@ -95,6 +96,10 @@ public class DBSoupSVGGenerator {
             <linearGradient id="overviewGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
                 <stop offset="100%" style="stop-color:#e9ecef;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="moduleHeaderGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
             </linearGradient>
             <linearGradient id="attributionGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.6" />
@@ -185,16 +190,24 @@ public class DBSoupSVGGenerator {
         .tooltip-group:hover .tooltip-bg,
         .tooltip-group:hover .tooltip-text,
         a:hover + .tooltip-group .tooltip-bg,
-        a:hover + .tooltip-group .tooltip-text {
+        a:hover + .tooltip-group .tooltip-text,
+        .interactive-field:hover + .tooltip-group .tooltip-bg,
+        .interactive-field:hover + .tooltip-group .tooltip-text {
             visibility: visible;
             opacity: 1;
         }
-        .legend-box { fill: url(#legendGradient); stroke: #34495e; stroke-width: 3; stroke-dasharray: 8,4; opacity: 1; }
+        .legend-box { fill: url(#legendGradient); stroke: #34495e; stroke-width: 2; opacity: 1; }
         .legend-header { fill: url(#legendHeaderGradient); stroke: #c0392b; stroke-width: 2; }
         .legend-title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
         .legend-text { font-family: 'Courier New', monospace; font-size: 11px; fill: #ecf0f1; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
         .legend-row { fill: none; stroke: #7f8c8d; stroke-width: 1; opacity: 0.8; stroke-dasharray: 2,2; }
         .overview-title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; fill: #2c3e50; }
+        .module-title { font-family: Arial, sans-serif; font-size: 16px; font-weight: 600; fill: #2c3e50; }
+        .module-description { font-family: Arial, sans-serif; font-size: 12px; font-weight: normal; fill: #7f8c8d; }
+        .module-link { font-family: Arial, sans-serif; font-size: 12px; font-weight: normal; fill: #3498db; }
+        .module-link:hover { fill: #2980b9; }
+        .module-tag { font-family: Arial, sans-serif; font-size: 11px; font-weight: 500; fill: #2980b9; }
+        .module-tag:hover { fill: #1a5999; }
         .overview-label { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2c3e50; }
         .overview-text { font-family: Arial, sans-serif; font-size: 12px; fill: #34495e; }
         .overview-section { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2980b9; }
@@ -216,9 +229,20 @@ public class DBSoupSVGGenerator {
             svg += generateArchitecturalOverview(overview, layout: layout)
         }
         
-        // Generate entities
-        for entity in allEntities {
-            svg += generateEntityBox(entity: entity, layout: layout)
+        // Generate module headers and swimlanes
+        svg += generateModuleHeaders(layout: layout)
+        svg += generateSwimlanes(layout: layout)
+        
+        // Generate entities organized by module
+        for moduleInfo in entitiesByModule {
+            // Generate standard entities first
+            for entity in moduleInfo.standardEntities {
+                svg += generateEntityBox(entity: entity, layout: layout)
+            }
+            // Then embedded entities
+            for entity in moduleInfo.embeddedEntities {
+                svg += generateEntityBox(entity: entity, layout: layout)
+            }
         }
         
         // Generate relationships legend
@@ -243,6 +267,14 @@ public class DBSoupSVGGenerator {
         }
         // Sort entities alphabetically by name for better scanning
         return entities.sorted { $0.name < $1.name }
+    }
+    
+    private func getEntitiesByModule() -> [(moduleName: String, moduleDescription: String?, standardEntities: [Entity], embeddedEntities: [Entity])] {
+        return document.schemaDefinition.moduleSections.map { moduleSection in
+            let standardEntities = moduleSection.entities.filter { $0.type == .standard }.sorted { $0.name < $1.name }
+            let embeddedEntities = moduleSection.entities.filter { $0.type == .embedded }.sorted { $0.name < $1.name }
+            return (moduleName: moduleSection.name, moduleDescription: moduleSection.description, standardEntities: standardEntities, embeddedEntities: embeddedEntities)
+        }
     }
 
     
@@ -322,9 +354,10 @@ public class DBSoupSVGGenerator {
                 let textCenterY = tooltipY + (tooltipHeight / 2) + 4  // Adjust for SVG text baseline
                 
                 svg += """
-                <a href="#\(referencedEntity)">
-                    <text x="\(position.x + padding)" y="\(fieldY)" class="\(fieldTextClass) \(fieldClass) interactive-field">\(xmlEscape(fieldText))</text>
-                </a>
+                <text x="\(position.x + padding)" y="\(fieldY)" 
+                      class="\(fieldTextClass) \(fieldClass) interactive-field"
+                      onclick="document.getElementById('\(referencedEntity)').scrollIntoView({behavior:'smooth'}); document.getElementById('\(referencedEntity)').style.outline='3px solid #9b59b6'; setTimeout(() => document.getElementById('\(referencedEntity)').style.outline='none', 1000);" 
+                      style="cursor: pointer;">\(xmlEscape(fieldText))</text>
                 <g class="tooltip-group">
                     <rect x="\(tooltipX)" y="\(tooltipY)" width="\(tooltipWidth)" height="\(tooltipHeight)" class="tooltip-bg"/>
                     <text x="\(textCenterX)" y="\(textCenterY)" text-anchor="middle" class="tooltip-text">\(xmlEscape(tooltipText))</text>
@@ -354,9 +387,10 @@ public class DBSoupSVGGenerator {
                 let textCenterY = tooltipY + (tooltipHeight / 2) + 4  // Adjust for SVG text baseline
                 
                 svg += """
-                <a href="#\(embeddedEntity)">
-                    <text x="\(position.x + padding)" y="\(fieldY)" class="\(fieldTextClass) \(fieldClass) interactive-field">\(xmlEscape(fieldText))</text>
-                </a>
+                <text x="\(position.x + padding)" y="\(fieldY)" 
+                      class="\(fieldTextClass) \(fieldClass) interactive-field"
+                      onclick="document.getElementById('\(embeddedEntity)').scrollIntoView({behavior:'smooth'}); document.getElementById('\(embeddedEntity)').style.outline='3px solid #8e44ad'; setTimeout(() => document.getElementById('\(embeddedEntity)').style.outline='none', 1000);" 
+                      style="cursor: pointer;">\(xmlEscape(fieldText))</text>
                 <g class="tooltip-group">
                     <rect x="\(tooltipX)" y="\(tooltipY)" width="\(tooltipWidth)" height="\(tooltipHeight)" class="tooltip-bg"/>
                     <text x="\(textCenterX)" y="\(textCenterY)" text-anchor="middle" class="tooltip-text">\(xmlEscape(tooltipText))</text>
@@ -488,14 +522,62 @@ public class DBSoupSVGGenerator {
         }
     }
     
+    private func generateModuleHeaders(layout: SVGLayout) -> String {
+        var svg = ""
+        
+        for header in layout.moduleHeaders {
+            let hasDescription = header.description != nil && !header.description!.isEmpty
+            let barHeight = hasDescription ? 40 : 32
+            let moduleId = "module-\(header.name.lowercased())"
+            
+            svg += """
+            <g class="module-header" id="\(moduleId)">
+                <rect x="\(header.x)" y="\(header.y)" width="4" height="\(barHeight)" 
+                      fill="#3498db" rx="2"/>
+                <text x="\(header.x + 20)" y="\(header.y + 21)" 
+                      class="module-title">\(xmlEscape(header.name))</text>
+            """
+            
+            if let description = header.description, !description.isEmpty {
+                svg += """
+                <text x="\(header.x + 20)" y="\(header.y + 36)" 
+                      class="module-description">\(xmlEscape(description))</text>
+                """
+            }
+            
+            svg += """
+            </g>
+            
+            """
+        }
+        
+        return svg
+    }
+    
+    private func generateSwimlanes(layout: SVGLayout) -> String {
+        var svg = ""
+        
+        for swimlane in layout.swimlanes {
+            svg += """
+            <line x1="\(swimlane.x)" y1="\(swimlane.y)" x2="\(swimlane.x + swimlane.width)" y2="\(swimlane.y)" 
+                  stroke="#bdc3c7" stroke-width="2" stroke-dasharray="10,5" opacity="0.6"/>
+            
+            """
+        }
+        
+        return svg
+    }
+    
     // MARK: - Layout Calculation
     
-    private func calculateDynamicLayout(entities: [Entity], relationships: [Relationship], architecturalOverview: ArchitecturalOverview?) -> SVGLayout {
+    private func calculateModularLayout(entitiesByModule: [(moduleName: String, moduleDescription: String?, standardEntities: [Entity], embeddedEntities: [Entity])], relationships: [Relationship], architecturalOverview: ArchitecturalOverview?) -> SVGLayout {
         var layout = SVGLayout()
         let basePadding = 40
         let entityPadding = 60
         let legendPadding = 30
         let maxEntitiesPerRow = 3
+        let moduleHeaderHeight = 50  // Increased to accommodate descriptions
+        let swimlaneSpacing = 30
         
         // Calculate architectural overview height (but don't use it for entity positioning)
         var overviewHeight = 0
@@ -505,41 +587,70 @@ public class DBSoupSVGGenerator {
         }
         
         var entityPositions: [String: EntityPosition] = [:]
-        var currentX = basePadding
-        var currentY = basePadding  // Remove overview height from entity positioning
-        layout.entitiesStartY = currentY
-        var currentRowHeight = 0
-        var entitiesInCurrentRow = 0
+        var moduleHeaders: [(x: Int, y: Int, width: Int, name: String, description: String?)] = []
+        var swimlanes: [(x: Int, y: Int, width: Int, height: Int)] = []
         
-        // Place entities in rows
-        for entity in entities {
-            let dimensions = calculateEntityDimensions(entity: entity)
+        let currentX = basePadding
+        var currentY = basePadding
+        layout.entitiesStartY = currentY
+        var maxModuleWidth = 0
+        
+        for (index, moduleInfo) in entitiesByModule.enumerated() {
+            let moduleStartY = currentY
             
-            // Check if we need a new row
-            if entitiesInCurrentRow >= maxEntitiesPerRow {
-                currentX = basePadding
-                currentY += currentRowHeight + entityPadding
-                currentRowHeight = 0
-                entitiesInCurrentRow = 0
+            // Add module header
+            currentY += moduleHeaderHeight
+            
+            // Process standard entities first
+            var moduleMaxX = currentX
+            let (standardPositions, standardEndY, standardMaxX) = layoutEntitiesInModule(
+                entities: moduleInfo.standardEntities,
+                startX: currentX,
+                startY: currentY,
+                maxEntitiesPerRow: maxEntitiesPerRow,
+                entityPadding: entityPadding
+            )
+            entityPositions.merge(standardPositions) { _, new in new }
+            currentY = standardEndY
+            moduleMaxX = max(moduleMaxX, standardMaxX)
+            
+            // Add small gap between standard and embedded entities if both exist
+            if !moduleInfo.standardEntities.isEmpty && !moduleInfo.embeddedEntities.isEmpty {
+                currentY += entityPadding / 2
             }
             
-            let position = EntityPosition(
-                x: currentX,
-                y: currentY,
-                width: dimensions.width,
-                height: dimensions.height
+            // Process embedded entities
+            let (embeddedPositions, embeddedEndY, embeddedMaxX) = layoutEntitiesInModule(
+                entities: moduleInfo.embeddedEntities,
+                startX: currentX,
+                startY: currentY,
+                maxEntitiesPerRow: maxEntitiesPerRow,
+                entityPadding: entityPadding
             )
-            entityPositions[entity.name] = position
+            entityPositions.merge(embeddedPositions) { _, new in new }
+            currentY = embeddedEndY
+            moduleMaxX = max(moduleMaxX, embeddedMaxX)
             
-            // Update for next entity
-            currentX += dimensions.width + entityPadding
-            currentRowHeight = max(currentRowHeight, dimensions.height)
-            entitiesInCurrentRow += 1
+            // Store module header info
+            let moduleWidth = moduleMaxX - currentX + basePadding
+            moduleHeaders.append((x: currentX, y: moduleStartY, width: moduleWidth, name: moduleInfo.moduleName, description: moduleInfo.moduleDescription))
+            maxModuleWidth = max(maxModuleWidth, moduleWidth)
+            
+            // Add swimlane (except for last module)
+            if index < entitiesByModule.count - 1 {
+                currentY += swimlaneSpacing
+                swimlanes.append((x: basePadding, y: currentY - swimlaneSpacing/2, width: moduleMaxX - basePadding + basePadding, height: 1))
+            }
         }
         
+        // Store layout information
+        layout.entityPositions = entityPositions
+        layout.moduleHeaders = moduleHeaders
+        layout.swimlanes = swimlanes
+        
         // Calculate entities area dimensions
-        let maxX = entityPositions.values.map { $0.x + $0.width }.max() ?? 0
-        let entitiesBottomY = currentY + currentRowHeight
+        let maxX = max(entityPositions.values.map { $0.x + $0.width }.max() ?? 0, maxModuleWidth)
+        let entitiesBottomY = currentY
         
         // Calculate legend dimensions and position
         let legendWidth = 400
@@ -555,13 +666,13 @@ public class DBSoupSVGGenerator {
         // Calculate color legend position (below overview, same width)
         let colorLegendHeight = 100  // Better fit for content
         let colorLegendX = overviewX
-        let colorLegendY = overviewY + overviewHeight + 20  // 20px gap below overview
+        let colorLegendY = overviewY + (overviewHeight - 20) + 20  // 20px gap below overview (accounting for overview height adjustment)
         let colorLegendWidth = overviewWidth  // Same width as overview
         
         // Calculate attribution position (below color legend, same width)
         let attributionHeight = 50  // Fixed height for attribution
         let attributionX = colorLegendX
-        let attributionY = colorLegendY + colorLegendHeight + 15  // 15px gap below color legend
+        let attributionY = colorLegendY + colorLegendHeight + 20  // 20px gap below color legend (consistent with other gaps)
         let attributionWidth = colorLegendWidth  // Same width as color legend
         
         // Set layout properties
@@ -589,6 +700,44 @@ public class DBSoupSVGGenerator {
                                             attributionY + attributionHeight + basePadding))))
         
         return layout
+    }
+    
+    private func layoutEntitiesInModule(entities: [Entity], startX: Int, startY: Int, maxEntitiesPerRow: Int, entityPadding: Int) -> ([String: EntityPosition], Int, Int) {
+        var entityPositions: [String: EntityPosition] = [:]
+        var currentX = startX
+        var currentY = startY
+        var currentRowHeight = 0
+        var entitiesInCurrentRow = 0
+        var maxX = startX
+        
+        for entity in entities {
+            let dimensions = calculateEntityDimensions(entity: entity)
+            
+            // Check if we need a new row
+            if entitiesInCurrentRow >= maxEntitiesPerRow {
+                currentX = startX
+                currentY += currentRowHeight + entityPadding
+                currentRowHeight = 0
+                entitiesInCurrentRow = 0
+            }
+            
+            let position = EntityPosition(
+                x: currentX,
+                y: currentY,
+                width: dimensions.width,
+                height: dimensions.height
+            )
+            entityPositions[entity.name] = position
+            
+            // Update for next entity
+            currentX += dimensions.width + entityPadding
+            currentRowHeight = max(currentRowHeight, dimensions.height)
+            entitiesInCurrentRow += 1
+            maxX = max(maxX, currentX)
+        }
+        
+        let finalY = entities.isEmpty ? startY : currentY + currentRowHeight
+        return (entityPositions, finalY, maxX)
     }
     
     private func calculateEntityDimensions(entity: Entity) -> (width: Int, height: Int) {
@@ -635,6 +784,19 @@ public class DBSoupSVGGenerator {
         if overview.purpose != nil { totalLines += 1 }
         if overview.domain != nil { totalLines += 1 }
         if overview.architecturePattern != nil { totalLines += 1 }
+        
+        // Account for module tag cloud (after pattern)
+        let moduleList = getModuleList()
+        if !moduleList.isEmpty {
+            totalLines += 1 // "Modules:" label
+            // More accurate estimation: use almost full width (380px available, starting at 85px offset)
+            let avgModuleWidth = 65 // More realistic average including shorter names + spacing
+            let availableWidth = 380 - 85 // Full width minus label offset
+            let modulesPerLine = max(1, availableWidth / avgModuleWidth)
+            let tagCloudLines = (moduleList.count + modulesPerLine - 1) / modulesPerLine
+            totalLines += tagCloudLines
+            totalLines += 1 // Extra spacing after tag cloud
+        }
         
         if !overview.dataDistribution.isEmpty {
             totalLines += 1 // Section header
@@ -856,6 +1018,42 @@ public class DBSoupSVGGenerator {
             currentY += 5
         }
         
+        // Module Tag Cloud (after pattern section)
+        let moduleList = getModuleList()
+        if !moduleList.isEmpty {
+            svg += """
+            <text x="\(x + 15)" y="\(currentY)" class="overview-label">Modules:</text>
+            
+            """
+            
+            var currentX = x + 85 // Start after the label
+            let tagSpacing = 8
+            let maxRowWidth = x + width - 20 // Leave minimal padding, use almost full width
+            
+            for moduleInfo in moduleList {
+                let moduleId = "module-\(moduleInfo.name.lowercased())"
+                let tagText = moduleInfo.name
+                let estimatedWidth = tagText.count * 6 + 12 // More accurate estimate: 6px per char + 12px padding
+                
+                // Check if we need a new line
+                if currentX + estimatedWidth > maxRowWidth {
+                    currentY += lineHeight
+                    currentX = x + 85
+                }
+                
+                svg += """
+                <rect x="\(currentX - 4)" y="\(currentY - 12)" width="\(estimatedWidth)" height="16" 
+                      fill="#e8f4f8" stroke="#3498db" stroke-width="1" rx="8" opacity="0.7"/>
+                <text x="\(currentX)" y="\(currentY)" class="module-tag" 
+                      onclick="document.getElementById('\(moduleId)').scrollIntoView({behavior:'smooth'}); document.getElementById('\(moduleId)').style.outline='3px solid #3498db'; setTimeout(() => document.getElementById('\(moduleId)').style.outline='none', 1000);" 
+                      style="cursor: pointer; fill: #2980b9; font-size: 11px;">\(xmlEscape(tagText))</text>
+                """
+                
+                currentX += estimatedWidth + tagSpacing
+            }
+            currentY += lineHeight + 8
+        }
+        
         // Data Distribution
         if !overview.dataDistribution.isEmpty {
             svg += """
@@ -935,6 +1133,12 @@ public class DBSoupSVGGenerator {
         
         svg += "</g>\n"
         return svg
+    }
+    
+    private func getModuleList() -> [(name: String, description: String?)] {
+        return document.schemaDefinition.moduleSections.map { moduleSection in
+            return (name: moduleSection.name, description: moduleSection.description)
+        }
     }
     
     private func generateColorLegend(layout: SVGLayout) -> String {
@@ -1088,6 +1292,8 @@ public class DBSoupSVGGenerator {
 
 struct SVGLayout {
     var entityPositions: [String: EntityPosition] = [:]
+    var moduleHeaders: [(x: Int, y: Int, width: Int, name: String, description: String?)] = []
+    var swimlanes: [(x: Int, y: Int, width: Int, height: Int)] = []
     var legendX: Int = 0
     var legendY: Int = 0
     var legendWidth: Int = 0

@@ -42,8 +42,8 @@ This guide provides a complete reference for all color codes used in DBSoup SVG 
 | **Optional** | Gray | `#c7c7c7` | Fields with `-` prefix |
 | **Indexed** | Blue | `#5352ed` | Fields with `!` prefix |
 | **Sensitive** | Red | `#ff4757` | Fields with `@` prefix |
-| **Foreign Key** | Purple | `#e056fd` | Fields with `[FK:...]` constraint **[Clickable]** |
-| **🆕 Embedded Entity Reference** | **Bright Yellow** | `#ffeb3b` | Standard entity fields referencing embedded entities **[Clickable]** |
+| **Foreign Key** | Purple | `#e056fd` | Fields with `[FK:...]` constraint **[Clickable + Instant Tooltip]** |
+| **🆕 Embedded Entity Reference** | **Bright Yellow** | `#ffeb3b` | Standard entity fields referencing embedded entities **[Clickable + Instant Tooltip]** |
 
 ### Embedded Entity Fields
 | Field Type | Color | Hex Code | Usage |
@@ -52,8 +52,8 @@ This guide provides a complete reference for all color codes used in DBSoup SVG 
 | **Optional** | Gray | `#c7c7c7` | Fields with `-` prefix (same as standard) |
 | **Indexed** | Blue | `#5352ed` | Fields with `!` prefix (same as standard) |
 | **Sensitive** | Red | `#ff4757` | Fields with `@` prefix (same as standard) |
-| **Foreign Key** | Purple | `#e056fd` | Fields with `[FK:...]` constraint **[Clickable]** (same as standard) |
-| **🆕 Embedded Entity Reference** | **Bright Yellow** | `#ffeb3b` | Embedded entity fields referencing embedded entities **[Clickable]** (same as standard) |
+| **Foreign Key** | Purple | `#e056fd` | Fields with `[FK:...]` constraint **[Clickable + Instant Tooltip]** (same as standard) |
+| **🆕 Embedded Entity Reference** | **Bright Yellow** | `#ffeb3b` | Embedded entity fields referencing embedded entities **[Clickable + Instant Tooltip]** (same as standard) |
 
 ## Embedded Entity Reference Color Logic
 - **Bright Yellow (#ffeb3b)**: All embedded entity references use the same bright yellow color for consistency
@@ -187,3 +187,9 @@ This change improves diagram readability and eliminates confusion about field se
 - **Background colors are configurable** - blue-grey (default), transparent, light grey, warm grey, or custom
 - **Default blue-grey background** provides professional appearance with excellent contrast
 - **Grey backgrounds enhance contrast** - dark entities stand out more against light backgrounds
+
+---
+
+### Related Documentation
+For complete information about **instant hover tooltips**, **clickable navigation**, and other interactive features, see:
+- 🎨 **[SVG Interactive Features Guide](10_SVG_INTERACTIVE_FEATURES.md)** - Comprehensive guide to all interactive SVG features including instant tooltips

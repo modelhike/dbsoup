@@ -368,13 +368,40 @@ DATABASE SCHEMA
 + Module1
 + Module2
 
-=== Module1 ====
+=== Module1 ===
+Optional module description providing context about the module's purpose.
+
 EntityName
 ============
 * field : Type
 ```
 
-### 4.2 Naming Conventions
+### 4.2 Module Descriptions
+
+Module descriptions are **optional single-line** descriptions that appear immediately after the module header. They provide context and documentation for the module's purpose:
+
+```dbsoup
+=== Core ===
+Multi-tenant user and organization management with account-based data segregation.
+
+Account # Main account entity
+==========
+* _id : ObjectId [PK]
+* Email : String [UK]
+```
+
+**Requirements:**
+- **Single line only** - no multi-line descriptions allowed
+- **Optional** - modules can have no description
+- Must appear immediately after module header (after any blank lines)
+
+**Guidelines:**
+- Keep descriptions concise (one sentence preferred)
+- Focus on the module's business purpose 
+- Mention key architectural patterns if relevant
+- Use present tense and professional language
+
+### 4.3 Naming Conventions
 - Entity names: PascalCase
 - Field names: camelCase
 - Module names: PascalCase

@@ -31,7 +31,9 @@ schema_definition ::= "=== DATABASE SCHEMA ===", NEWLINE, module_list, { module_
 
 module_list ::= { "+", identifier, [ inline_comment ], NEWLINE | comment }, NEWLINE;
 
-module_section ::= "=== ", identifier, " ====", NEWLINE, { entity_definition | comment | blank_line };
+module_section ::= "=== ", identifier, " ====", NEWLINE, [ module_description ], { entity_definition | comment | blank_line };
+
+module_description ::= single_line_text, NEWLINE;
 
 entity_definition ::= ( standard_entity | embedded_entity );
 
@@ -87,6 +89,7 @@ number ::= DIGIT, { DIGIT };
 
 text_until_newline ::= {? any character except NEWLINE ?};
 text_until_bracket_or_comma ::= {? any character except "]" or "," ?};
+single_line_text ::= {? any character except NEWLINE ?};
 
 LETTER ::= "a"..."z" | "A"..."Z";
 DIGIT ::= "0"..."9";

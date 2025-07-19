@@ -87,10 +87,12 @@ public struct SchemaDefinition {
 /// Module section containing entities
 public struct ModuleSection {
     public let name: String
+    public let description: String?
     public let entities: [Entity]
     
-    public init(name: String, entities: [Entity]) {
+    public init(name: String, description: String? = nil, entities: [Entity]) {
         self.name = name
+        self.description = description
         self.entities = entities
     }
 }
@@ -293,6 +295,11 @@ public class DBSoupLexer {
     public func peekLine() -> String? {
         guard hasMoreLines() else { return nil }
         return lines[currentLine]
+    }
+    
+    public func peekNextLine() -> String? {
+        guard currentLine + 1 < lines.count else { return nil }
+        return lines[currentLine + 1]
     }
     
     public func nextLine() -> String? {
@@ -573,9 +580,39 @@ public class DBSoupParser {
         let components = withoutStart.components(separatedBy: "=")
         let moduleName = components[0].trimmingCharacters(in: .whitespaces)
         
+        // Check for optional module description on the next line
+        // Skip empty lines first
+        while lexer.peekLine()?.trimmingCharacters(in: .whitespaces).isEmpty == true {
+            _ = lexer.nextLine()
+        }
+        
+        var moduleDescription: String? = nil
+        if let nextLine = lexer.peekLine()?.trimmingCharacters(in: .whitespaces),
+           !nextLine.isEmpty && !nextLine.starts(with: "#") && !isEntityHeader(nextLine) {
+            // This looks like a description line
+            moduleDescription = lexer.nextLine()?.trimmingCharacters(in: .whitespaces)
+        }
+        
         let entities = try parseEntities()
         
-        return ModuleSection(name: moduleName, entities: entities)
+        return ModuleSection(name: moduleName, description: moduleDescription, entities: entities)
+    }
+    
+    private func isEntityHeader(_ line: String) -> Bool {
+        // Check if line looks like an entity header (typically followed by ===)
+        // or is a comment line starting with #
+        let trimmed = line.trimmingCharacters(in: .whitespaces)
+        if trimmed.starts(with: "#") {
+            return true
+        }
+        
+        // Check if the next line is a separator line (starts with =)
+        if let nextLine = lexer.peekNextLine()?.trimmingCharacters(in: .whitespaces),
+           nextLine.starts(with: "=") && nextLine.count >= 5 {
+            return true
+        }
+        
+        return false
     }
     
     private func parseEntities() throws -> [Entity] {
