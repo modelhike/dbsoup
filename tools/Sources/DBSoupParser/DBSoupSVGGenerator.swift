@@ -69,8 +69,6 @@ public class DBSoupSVGGenerator {
         
         var svg = """
         <svg xmlns="http://www.w3.org/2000/svg" 
-             width="\(layout.totalWidth)" 
-             height="\(layout.totalHeight)" 
              viewBox="0 0 \(layout.totalWidth) \(layout.totalHeight)"
              preserveAspectRatio="xMidYMid meet">
         <defs>
@@ -122,7 +120,7 @@ public class DBSoupSVGGenerator {
             </filter>
         </defs>
         <style>
-        svg { max-width: none !important; height: auto !important; }
+        svg { width: 100%; height: auto; max-width: 100%; display: block; }
         .entity-box { fill: url(#entityGradient); stroke: #444444; stroke-width: 2; }
         .entity-header { fill: url(#headerGradient); stroke: #444444; stroke-width: 2; }
         .entity-title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: white; }
@@ -383,7 +381,7 @@ public class DBSoupSVGGenerator {
                 <g class="field-with-tooltip">
                     <text x="\(position.x + padding)" y="\(fieldY)" 
                           class="\(fieldTextClass) \(fieldClass) interactive-field"
-                          onclick="document.getElementById('\(referencedEntity)').scrollIntoView({behavior:'smooth'}); var rects = document.getElementById('\(referencedEntity)').getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#9b59b6'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 800);" 
+                          onclick="document.getElementById('\(referencedEntity)').scrollIntoView({behavior:'smooth'}); var rects = document.getElementById('\(referencedEntity)').getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#9b59b6'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500);" 
                           style="cursor: pointer;">\(xmlEscape(fieldText))</text>
                     \(generateConstraintTags(field: field, x: position.x + padding, y: fieldY, fieldText: fieldText))
                     <g class="tooltip-group">
@@ -419,7 +417,7 @@ public class DBSoupSVGGenerator {
                 <g class="field-with-tooltip">
                     <text x="\(position.x + padding)" y="\(fieldY)" 
                           class="\(fieldTextClass) \(fieldClass) interactive-field"
-                          onclick="document.getElementById('\(embeddedEntity)').scrollIntoView({behavior:'smooth'}); var rects = document.getElementById('\(embeddedEntity)').getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#8e44ad'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 800);" 
+                          onclick="document.getElementById('\(embeddedEntity)').scrollIntoView({behavior:'smooth'}); var rects = document.getElementById('\(embeddedEntity)').getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#8e44ad'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500);" 
                           style="cursor: pointer;">\(xmlEscape(fieldText))</text>
                     \(generateConstraintTags(field: field, x: position.x + padding, y: fieldY, fieldText: fieldText))
                     <g class="tooltip-group">
@@ -626,9 +624,9 @@ public class DBSoupSVGGenerator {
     private func calculateModularLayout(entitiesByModule: [(moduleName: String, moduleDescription: String?, standardEntities: [Entity], embeddedEntities: [Entity])], relationships: [Relationship], architecturalOverview: ArchitecturalOverview?) -> SVGLayout {
         var layout = SVGLayout()
         let basePadding = 40
-        let entityPadding = 60
+        let entityPadding = 25
         let legendPadding = 30
-        let maxEntitiesPerRow = 3
+        let maxEntitiesPerRow = 5
         let moduleHeaderHeight = 50  // Increased to accommodate descriptions
         let swimlaneSpacing = 30
         
@@ -808,16 +806,16 @@ public class DBSoupSVGGenerator {
         let headerHeight = 35
         let fieldHeight = 18
         let padding = 12
-        let minWidth = 280
+        let minWidth = 240
         
         // Calculate width based on longest field text
         let maxFieldWidth = entity.fields.map { field in
             let fieldText = formatFieldText(field: field)
-            return fieldText.count * 8 + padding * 2 // Approximate character width
+            return fieldText.count * 7 + padding * 2 // Approximate character width
         }.max() ?? 0
         
-        let titleWidth = entity.name.count * 12 + padding * 2
-        let commentWidth = entity.comment != nil ? (entity.comment!.count * 8 + padding * 2) : 0
+        let titleWidth = entity.name.count * 10 + padding * 2
+        let commentWidth = entity.comment != nil ? (entity.comment!.count * 7 + padding * 2) : 0
         let width = max(minWidth, max(maxFieldWidth, max(titleWidth, commentWidth)))
         
         // Calculate height based on field count (comment is now in header area)
@@ -962,12 +960,12 @@ public class DBSoupSVGGenerator {
             let relationshipText = formatRelationshipForLegend(relationship)
             
             legend += """
-                <a href="#\(relationship.fromEntity)" style="cursor: pointer;">
-                    <text x="\(col1X)" y="\(rowY)" class="legend-text">\(xmlEscape(relationship.fromEntity))</text>
-                </a>
-                <a href="#\(relationship.toEntity)" style="cursor: pointer;">
-                    <text x="\(col2X)" y="\(rowY)" class="legend-text">\(xmlEscape(relationship.toEntity))</text>
-                </a>
+                <text x="\(col1X)" y="\(rowY)" class="legend-text interactive-field" 
+                      onclick="document.getElementById('\(relationship.fromEntity)').scrollIntoView({behavior:'smooth'}); var rects = document.getElementById('\(relationship.fromEntity)').getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#9b59b6'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500);"
+                      style="cursor: pointer;">\(xmlEscape(relationship.fromEntity))</text>
+                <text x="\(col2X)" y="\(rowY)" class="legend-text interactive-field" 
+                      onclick="document.getElementById('\(relationship.toEntity)').scrollIntoView({behavior:'smooth'}); var rects = document.getElementById('\(relationship.toEntity)').getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#9b59b6'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500);"
+                      style="cursor: pointer;">\(xmlEscape(relationship.toEntity))</text>
                 <text x="\(col3X)" y="\(rowY)" class="legend-text">\(xmlEscape(relationshipText))</text>
             
             """
@@ -1146,7 +1144,7 @@ public class DBSoupSVGGenerator {
                 <rect x="\(currentX - 4)" y="\(currentY - 12)" width="\(estimatedWidth)" height="16" 
                       fill="#e8f4f8" stroke="#3498db" stroke-width="1" rx="8" opacity="0.7"/>
                 <text x="\(currentX)" y="\(currentY)" class="module-tag" 
-                      onclick="document.getElementById('\(moduleId)').scrollIntoView({behavior:'smooth'}); var moduleGroup = document.getElementById('\(moduleId)'); if(moduleGroup) { var rects = moduleGroup.getElementsByTagName('rect'); for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke='#3498db'; rects[i].style.strokeWidth='4'; } setTimeout(() => { for(var i=0; i&lt;rects.length; i++) { rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 800); }" 
+                      onclick="document.getElementById('\(moduleId)').scrollIntoView({behavior:'smooth'}); var moduleGroup = document.getElementById('\(moduleId)'); if(moduleGroup) { var moduleTitle = moduleGroup.getElementsByClassName('module-title')[0]; var rects = moduleGroup.getElementsByTagName('rect'); if(moduleTitle) { moduleTitle.style.fill='#e74c3c'; moduleTitle.style.fontWeight='900'; } for(var i=0; i&lt;rects.length; i++) { rects[i].style.fill='#e74c3c'; rects[i].style.stroke='#c0392b'; rects[i].style.strokeWidth='2'; } setTimeout(() => { if(moduleTitle) { moduleTitle.style.fill=''; moduleTitle.style.fontWeight=''; } for(var i=0; i&lt;rects.length; i++) { rects[i].style.fill=''; rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500); }" 
                       style="cursor: pointer; fill: #2980b9; font-size: 11px;">\(xmlEscape(tagText))</text>
                 """
                 
