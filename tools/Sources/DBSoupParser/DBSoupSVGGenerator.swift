@@ -232,6 +232,8 @@ public class DBSoupSVGGenerator {
         .constraint-tag:hover .constraint-tag-bg { fill: rgba(52, 73, 94, 0.9); stroke: #2c3e50; stroke-width: 1.5; }
         .constraint-tag:hover .constraint-tag-text { fill: white; font-weight: bold; }
         .constraint-tag:hover { cursor: none; }
+        .browser-message { opacity: 1; transition: opacity 0.3s ease; }
+        .browser-message:hover { opacity: 0.6; }
         .overview-label { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2c3e50; }
         .overview-text { font-family: Arial, sans-serif; font-size: 12px; fill: #34495e; }
         .overview-section { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2980b9; }
@@ -247,6 +249,9 @@ public class DBSoupSVGGenerator {
             
             """
         }
+        
+        // Add browser interactivity message
+        svg += generateBrowserMessage(layout: layout)
         
         // Generate architectural overview if available
         if let overview = architecturalOverview {
@@ -628,7 +633,7 @@ public class DBSoupSVGGenerator {
     
     private func calculateModularLayout(entitiesByModule: [(moduleName: String, moduleDescription: String?, standardEntities: [Entity], embeddedEntities: [Entity])], relationships: [Relationship], architecturalOverview: ArchitecturalOverview?) -> SVGLayout {
         var layout = SVGLayout()
-        let basePadding = 40
+        let basePadding = 50 // Increased to make room for browser message
         let entityPadding = 25
         let legendPadding = 30
         let maxEntitiesPerRow = 5
@@ -1288,6 +1293,41 @@ public class DBSoupSVGGenerator {
         
         legend += "</g>\n"
         return legend
+    }
+    
+    private func generateBrowserMessage(layout: SVGLayout) -> String {
+        let messageText = "💡 Open in Web Browser for full interactivity (tooltips, navigation, hover effects)"
+        let x = layout.totalWidth / 2
+        let y = 20
+        let messageWidth = 600
+        let messageHeight = 25
+        let messageX = x - (messageWidth / 2)
+        let messageY = y - 12
+        
+        let browserMessage = """
+        <g class="browser-message" id="browser-message">
+            <rect x="\(messageX)" y="\(messageY)" width="\(messageWidth)" height="\(messageHeight)" 
+                  fill="rgba(52, 152, 219, 0.1)" stroke="rgba(52, 152, 219, 0.3)" stroke-width="1" 
+                  rx="12" opacity="0.9"/>
+            <text x="\(x)" y="\(y)" text-anchor="middle" 
+                  font-family="'Segoe UI', Arial, sans-serif" font-size="12px" font-weight="500" 
+                  fill="#2980b9" fill-opacity="0.8">
+                \(xmlEscape(messageText))
+            </text>
+        </g>
+        <script type="text/javascript">
+        <![CDATA[
+        // Hide browser message when JavaScript is available (browser context)
+        (function() {
+            var msg = document.getElementById('browser-message');
+            if (msg) { msg.style.display = 'none'; }
+        })();
+        ]]>
+        </script>
+        
+        """
+        
+        return browserMessage
     }
     
     private func generateAttribution(layout: SVGLayout) -> String {
