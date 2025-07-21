@@ -227,8 +227,11 @@ public class DBSoupSVGGenerator {
         .module-tag { font-family: Arial, sans-serif; font-size: 11px; font-weight: 500; fill: #2980b9; }
         .module-tag:hover { fill: #1a5999; }
         .version-text { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
-        .constraint-tag-bg { fill: rgba(149, 165, 166, 0.15); stroke: rgba(149, 165, 166, 0.3); stroke-width: 0.5; }
-        .constraint-tag-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 9px; font-weight: normal; fill: #7f8c8d; }
+        .constraint-tag-bg { fill: rgba(149, 165, 166, 0.15); stroke: rgba(149, 165, 166, 0.3); stroke-width: 0.5; transition: fill 0.2s ease, stroke 0.2s ease; }
+        .constraint-tag-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 9px; font-weight: normal; fill: #7f8c8d; transition: fill 0.2s ease, font-weight 0.2s ease; }
+        .constraint-tag:hover .constraint-tag-bg { fill: rgba(52, 73, 94, 0.9); stroke: #2c3e50; stroke-width: 1.5; }
+        .constraint-tag:hover .constraint-tag-text { fill: white; font-weight: bold; }
+        .constraint-tag:hover { cursor: none; }
         .overview-label { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2c3e50; }
         .overview-text { font-family: Arial, sans-serif; font-size: 12px; fill: #34495e; }
         .overview-section { font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #2980b9; }
@@ -543,10 +546,12 @@ public class DBSoupSVGGenerator {
             let tagHeight = 10
             
             tagSvg += """
-            <rect x="\(tagX)" y="\(y - 8)" width="\(tagWidth)" height="\(tagHeight)" 
-                  class="constraint-tag-bg" rx="5"/>
-            <text x="\(tagX + tagWidth/2)" y="\(y - 3)" class="constraint-tag-text" 
-                  text-anchor="middle" dominant-baseline="middle">\(xmlEscape(tagText))</text>
+            <g class="constraint-tag">
+                <rect x="\(tagX)" y="\(y - 8)" width="\(tagWidth)" height="\(tagHeight)" 
+                      class="constraint-tag-bg" rx="5"/>
+                <text x="\(tagX + tagWidth/2)" y="\(y - 3)" class="constraint-tag-text" 
+                      text-anchor="middle" dominant-baseline="middle">\(xmlEscape(tagText))</text>
+            </g>
             
             """
             
