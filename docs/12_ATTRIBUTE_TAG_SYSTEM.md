@@ -19,7 +19,7 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 - **Color**: Purple background (`#e056fd`) with purple border
 - **Special Features**:
   - Always shows full entity name for clarity
-  - Uses smaller font (10px) and minimal padding for compactness
+  - Uses optimized font (11px) and minimal padding for compactness
   - Clickable navigation to referenced entity
   - Instant hover tooltip showing entity name
 
@@ -73,7 +73,7 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 ## 🎨 Visual Specifications
 
 ### Tag Dimensions and Spacing
-- **Font Size**: 11px (10px for FK tags specifically)
+- **Font Size**: 11px for all tag types (consistent sizing)
 - **Tag Height**: 12px (10px for FK tags)
 - **Padding**: 6px horizontal, minimal vertical
 - **Border Radius**: 3px for modern rounded corners

@@ -168,7 +168,7 @@ DBSoup SVG diagrams now include **compact, color-coded attribute tags** that dis
 - **Visual**: `[fk - EntityName]` with purple styling
 - **Interactive**: Clickable navigation to referenced entity
 - **Hover**: Instant tooltip showing entity name
-- **Special**: Uses smaller font (10px) and minimal padding for compactness
+- **Special**: Uses consistent font (11px) and minimal padding for compactness
 
 #### Enum Constraint Tags (Blue)  
 - **Visual**: `[enum]` with blue styling

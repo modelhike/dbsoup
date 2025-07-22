@@ -83,7 +83,7 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 - Tried 7px → too small
 - Tried 5px → too small
 - Settled on 11px → perfect balance
-- FK tags use 10px → optimal for compactness
+- FK tags initially 10px → increased to 11px for better legibility and consistency
 
 ### Color Adjustments ✅
 - System tag text: #2c3e50 → #6c757d → #999999 (final: lighter gray)
@@ -158,9 +158,12 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 1. **Visual Design Excellence**: Balanced compact tags that enhance rather than overwhelm
 2. **Interactive Innovation**: Hover tooltips and clickable navigation add functional value
 3. **Color Theory Application**: Thoughtful color choices that support visual hierarchy
-4. **Performance Optimization**: Efficient rendering with smooth animations
-5. **Comprehensive Documentation**: Complete guides for developers and AI systems
-6. **User-Centered Design**: Iterative refinements based on visual feedback
+4. **Legible Hierarchy**: FK tags use medium purple for readable hierarchy with bright FK fields
+5. **Font Consistency**: All tag types now use 11px font for uniform appearance and readability
+6. **Logical Categorization**: "• now" uses default (orange) styling since it represents default values
+7. **Performance Optimization**: Efficient rendering with smooth animations
+8. **Comprehensive Documentation**: Complete guides for developers and AI systems
+9. **User-Centered Design**: Iterative refinements based on visual feedback
 
 ## 🚀 Future Enhancement Potential
 

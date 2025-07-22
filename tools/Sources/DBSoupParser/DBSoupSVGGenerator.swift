@@ -246,9 +246,9 @@ public class DBSoupSVGGenerator {
                 .tag-constraint { fill: rgba(52, 152, 219, 0.15); stroke: #3498db; stroke-width: 0.4; }
                 .tag-constraint-text { fill: #2980b9; font-weight: 600; font-size: 11px; }
                 
-                /* FK tags - Special styling for foreign keys */
-                .tag-fk { fill: rgba(52, 152, 219, 0.15); stroke: #3498db; stroke-width: 0.4; }
-                .tag-fk-text { fill: #2980b9; font-weight: 600; font-size: 10px; }
+                /* FK tags - Medium purple for legible visual hierarchy */
+                .tag-fk { fill: rgba(168, 85, 205, 0.15); stroke: #a855cd; stroke-width: 0.4; }
+                .tag-fk-text { fill: #a855cd; font-weight: 600; font-size: 11px; }
                 
                 /* Encrypted tags - Red border (matches sensitive fields) */
                 .tag-encrypted { fill: rgba(255, 71, 87, 0.15); stroke: #ff4757; stroke-width: 0.4; }
