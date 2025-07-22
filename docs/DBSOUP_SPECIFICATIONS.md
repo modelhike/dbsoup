@@ -16,13 +16,16 @@ Every DBSoup file can optionally start with a YAML header containing metadata:
 #### YAML Header Fields
 
 - **@specs**: URL to the DBSoup specifications (for reference and validation)
+- **@Dbname**: Name of the database schema (displayed prominently in SVG diagrams)
 - **@ver**: Version of the DBSoup format being used (semantic versioning)
 
-The YAML header is parsed by DBSoup tools and the version is displayed in generated SVG diagrams.
+The YAML header is parsed by DBSoup tools and the database name and version are displayed in generated SVG diagrams.
 
-#### Version Display
+#### Database Name and Version Display
 
-  When present, the version from the YAML header is displayed in the generated SVG diagram above the relationship legend box, formatted as "Db Schema v[version]".
+  When present, the database name and version from the YAML header are displayed in the generated SVG diagram above the relationship legend box:
+  - **Database name**: Displayed prominently at the top (e.g., "RoadWarrior")
+  - **Version**: Displayed below the database name, formatted as "Db Schema v[version]" (e.g., "Db Schema v0.1")
 
 #### Version Display Customization
 

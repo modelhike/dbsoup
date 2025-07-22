@@ -58,6 +58,7 @@ public class DBSoupGenerator {
     private func generateYAMLHeader() {
         output.append("---")
         output.append("@specs: https://www.dbsoup.com/SPECS.md")
+        output.append("@Dbname: <App Dbname>")
         output.append("@ver: 0.1")
         output.append("---")
         output.append("")

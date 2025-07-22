@@ -6,10 +6,12 @@ import Foundation
 public struct YAMLHeader {
     public let specs: String?
     public let version: String?
+    public let dbname: String?
     
-    public init(specs: String? = nil, version: String? = nil) {
+    public init(specs: String? = nil, version: String? = nil, dbname: String? = nil) {
         self.specs = specs
         self.version = version
+        self.dbname = dbname
     }
 }
 
@@ -402,6 +404,7 @@ public class DBSoupParser {
         
         var specs: String? = nil
         var version: String? = nil
+        var dbname: String? = nil
         
         // Parse YAML content until closing "---"
         while let line = lexer.nextLine() {
@@ -414,10 +417,12 @@ public class DBSoupParser {
                 specs = String(trimmedLine.dropFirst(7)).trimmingCharacters(in: .whitespacesAndNewlines)
             } else if trimmedLine.hasPrefix("@ver:") {
                 version = String(trimmedLine.dropFirst(5)).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if trimmedLine.hasPrefix("@Dbname:") {
+                dbname = String(trimmedLine.dropFirst(8)).trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }
         
-        return YAMLHeader(specs: specs, version: version)
+        return YAMLHeader(specs: specs, version: version, dbname: dbname)
     }
     
     // MARK: - Header Parsing

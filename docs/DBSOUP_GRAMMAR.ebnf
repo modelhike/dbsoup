@@ -13,7 +13,7 @@ yaml_header ::= "---", NEWLINE, { yaml_field }, "---", NEWLINE;
 
 yaml_field ::= yaml_key, ":", yaml_value, NEWLINE;
 
-yaml_key ::= "@specs" | "@ver";
+yaml_key ::= "@specs" | "@Dbname" | "@ver";
 
 yaml_value ::= [ " " ], ( url | version_string | string );
 
