@@ -8,7 +8,7 @@ The DBSoup Swift Parser Toolkit provides a complete solution for working with DB
 
 - **Parser**: Parse DBSoup files into structured Swift objects
 - **Validator**: Validate DBSoup documents against the specification
-- **Generator**: Generate properly formatted DBSoup files from parsed structures
+- **Formatter**: Format and prettify DBSoup files with consistent alignment and spacing
 - **Statistics**: Analyze DBSoup documents and generate usage statistics
 - **CLI Tool**: Command-line interface for all operations
 
@@ -200,7 +200,7 @@ The generator provides sophisticated formatting and output capabilities:
 
 #### **Output Customization**
 ```swift
-let config = DBSoupGeneratorConfig(
+let config = DBSoupFormatterConfig(
     indentationSpaces: 4,              // Spaces for indentation
     fieldNameWidth: 20,                // Width for field names column
     dataTypeWidth: 25,                 // Width for data types column
@@ -211,11 +211,11 @@ let config = DBSoupGeneratorConfig(
 )
 ```
 
-#### **Generation Capabilities**
+#### **Formatting Capabilities**
 - **Pretty Printing**: Professional formatting with consistent alignment
-- **Partial Generation**: Generate specific modules or entities
+- **Partial Formatting**: Format specific modules or entities
 - **Format Validation**: Ensure output conforms to DBSoup specification
-- **Round-trip Compatibility**: Parse → Generate → Parse produces identical results
+- **Round-trip Compatibility**: Parse → Format → Parse produces identical results
 
 ## Installation
 
@@ -341,12 +341,12 @@ if !result.warnings.isEmpty {
 //   • Many-to-many relationship without via entity: User -> Role
 ```
 
-### Advanced Generation with Custom Formatting
+### Advanced Formatting with Custom Configuration
 
 ```swift
 import DBSoupParser
 
-let config = DBSoupGeneratorConfig(
+let config = DBSoupFormatterConfig(
     fieldNameWidth: 20,
     dataTypeWidth: 25,
     constraintColumnStart: 45,
@@ -355,8 +355,8 @@ let config = DBSoupGeneratorConfig(
     sortFieldsAlphabetically: true
 )
 
-let generator = DBSoupGenerator(config: config)
-let formattedOutput = generator.generate(document: document)
+    let formatter = DBSoupFormatter(config: config)
+let formattedOutput = formatter.format(document: document)
 
 // Example formatted output:
 // @example.dbsoup
@@ -827,13 +827,13 @@ class DBSoupValidator {
 - Cross-reference validation
 - Circular reference detection
 
-#### `DBSoupGenerator`
-Generates formatted DBSoup text from parsed structures.
+#### `DBSoupFormatter`
+Formats and prettifies DBSoup text from parsed structures.
 
 ```swift
-class DBSoupGenerator {
-    init(config: DBSoupGeneratorConfig = .default)
-    func generate(document: DBSoupDocument) -> String
+class DBSoupFormatter {
+    init(config: DBSoupFormatterConfig = .default)
+    func format(document: DBSoupDocument) -> String
 }
 ```
 
@@ -1138,9 +1138,9 @@ The test suite covers:
   ✅ Validate foreign key references
   ✅ Check constraint validity
 
-📋 Generation
+📋 Formatting
 -------------
-  ✅ Generate DBSoup from parsed document
+  ✅ Format DBSoup from parsed document
   ✅ Maintain format consistency
   ✅ Apply custom configuration
   ✅ Preserve comments
@@ -1163,10 +1163,10 @@ Failed: 0
 
 ## Configuration
 
-### Generator Configuration
+### Formatter Configuration
 
 ```swift
-let config = DBSoupGeneratorConfig(
+let config = DBSoupFormatterConfig(
     indentationSpaces: 4,                    // Spaces for indentation
     fieldNameWidth: 20,                      // Width for field names column
     dataTypeWidth: 25,                       // Width for data types column

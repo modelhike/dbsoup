@@ -28,7 +28,7 @@ let package = Package(
             sources: [
                 "DBSoupParser.swift",
                 "DBSoupValidator.swift",
-                "DBSoupGenerator.swift",
+                "DBSoupFormatter.swift",
                 "DBSoupSVGGenerator.swift",
                 "DBSoupMermaidGenerator.swift"
             ]

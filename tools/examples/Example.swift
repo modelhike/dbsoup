@@ -149,7 +149,7 @@ class DBSoupExample {
     
     private func demonstrateFormatting(_ document: DBSoupDocument) {
         // Create a custom configuration
-        let config = DBSoupGeneratorConfig(
+        let config = DBSoupFormatterConfig(
             fieldNameWidth: 18,
             dataTypeWidth: 22,
             constraintColumnStart: 42,
@@ -158,7 +158,7 @@ class DBSoupExample {
             sortFieldsAlphabetically: false
         )
         
-        let generator = DBSoupGenerator(config: config)
+        let formatter = DBSoupFormatter(config: config)
         
         // Generate formatted output for just the User entity
         if let coreModule = document.schemaDefinition.moduleSections.first(where: { $0.name == "Core" }),
@@ -175,7 +175,7 @@ class DBSoupExample {
             
             print("✨ Formatted User Entity:")
             print("```")
-            let formattedOutput = generator.generate(document: sampleDocument)
+            let formattedOutput = formatter.format(document: sampleDocument)
             print(formattedOutput)
             print("```")
         }

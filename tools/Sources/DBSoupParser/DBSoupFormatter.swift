@@ -1,8 +1,8 @@
 import Foundation
 
-// MARK: - Generator Configuration
+// MARK: - Formatter Configuration
 
-public struct DBSoupGeneratorConfig {
+public struct DBSoupFormatterConfig {
     public let indentationSpaces: Int
     public let fieldNameWidth: Int
     public let dataTypeWidth: Int
@@ -29,33 +29,33 @@ public struct DBSoupGeneratorConfig {
         self.sortFieldsAlphabetically = sortFieldsAlphabetically
     }
     
-    public static let `default` = DBSoupGeneratorConfig()
+    public static let `default` = DBSoupFormatterConfig()
 }
 
-// MARK: - Generator
+// MARK: - Formatter
 
-public class DBSoupGenerator {
-    private let config: DBSoupGeneratorConfig
+public class DBSoupFormatter {
+    private let config: DBSoupFormatterConfig
     private var output: [String] = []
     
-    public init(config: DBSoupGeneratorConfig = .default) {
+    public init(config: DBSoupFormatterConfig = .default) {
         self.config = config
     }
     
-    public func generate(document: DBSoupDocument) -> String {
+    public func format(document: DBSoupDocument) -> String {
         output.removeAll()
         
-        generateYAMLHeader()
-        generateHeader(document.header)
-        generateRelationshipDefinitions(document.relationshipDefinitions)
-        generateSchemaDefinition(document.schemaDefinition)
+        formatYAMLHeader()
+        formatHeader(document.header)
+        formatRelationshipDefinitions(document.relationshipDefinitions)
+        formatSchemaDefinition(document.schemaDefinition)
         
         return output.joined(separator: "\n")
     }
     
-    // MARK: - YAML Header Generation
+    // MARK: - YAML Header Formatting
     
-    private func generateYAMLHeader() {
+    private func formatYAMLHeader() {
         output.append("---")
         output.append("@specs: https://www.dbsoup.com/SPECS.md")
         output.append("@Dbname: <App Dbname>")
@@ -64,18 +64,18 @@ public class DBSoupGenerator {
         output.append("")
     }
     
-    // MARK: - Header Generation
+    // MARK: - Header Formatting
     
-    private func generateHeader(_ header: DBSoupHeader?) {
+    private func formatHeader(_ header: DBSoupHeader?) {
         guard let header = header else { return }
         
         output.append("@\(header.filename).dbsoup")
         output.append("")
     }
     
-    // MARK: - Relationship Definitions Generation
+    // MARK: - Relationship Definitions Formatting
     
-    private func generateRelationshipDefinitions(_ relationshipDefs: RelationshipDefinitions?) {
+    private func formatRelationshipDefinitions(_ relationshipDefs: RelationshipDefinitions?) {
         guard let relationshipDefs = relationshipDefs else { return }
         
         output.append("=== RELATIONSHIP DEFINITIONS ===")
@@ -87,7 +87,7 @@ public class DBSoupGenerator {
             output.append("# \(cardinalityGroup)")
             
             for relationship in relationships {
-                output.append(generateRelationshipLine(relationship))
+                output.append(formatRelationshipLine(relationship))
             }
             
             output.append("")
@@ -133,7 +133,7 @@ public class DBSoupGenerator {
         }
     }
     
-    private func generateRelationshipLine(_ relationship: Relationship) -> String {
+    private func formatRelationshipLine(_ relationship: Relationship) -> String {
         var line = "\(relationship.fromEntity) -> \(relationship.toEntity) [\(relationship.cardinality.rawValue)]"
         
         if let nature = relationship.nature {
@@ -151,9 +151,9 @@ public class DBSoupGenerator {
         return line
     }
     
-    // MARK: - Schema Definition Generation
+    // MARK: - Schema Definition Formatting
     
-    private func generateSchemaDefinition(_ schemaDefinition: SchemaDefinition) {
+    private func formatSchemaDefinition(_ schemaDefinition: SchemaDefinition) {
         output.append("=== DATABASE SCHEMA ===")
         
         // Generate module list
@@ -169,11 +169,11 @@ public class DBSoupGenerator {
         }
         
         for section in sortedSections {
-            generateModuleSection(section)
+            formatModuleSection(section)
         }
     }
     
-    private func generateModuleSection(_ section: ModuleSection) {
+    private func formatModuleSection(_ section: ModuleSection) {
         output.append("=== \(section.name) ===")
         output.append("")
         
@@ -183,11 +183,11 @@ public class DBSoupGenerator {
         }
         
         for entity in sortedEntities {
-            generateEntity(entity)
+            formatEntity(entity)
         }
     }
     
-    private func generateEntity(_ entity: Entity) {
+    private func formatEntity(_ entity: Entity) {
         // Entity header
         var headerLine = entity.name
         if let comment = entity.comment, config.includeComments {
@@ -210,27 +210,27 @@ public class DBSoupGenerator {
         }
         
         for field in sortedFields {
-            output.append(generateField(field))
+            output.append(formatField(field))
         }
         
         // Relationship sections
         for relationshipSection in entity.relationshipSections {
-            generateRelationshipSection(relationshipSection)
+            formatRelationshipSection(relationshipSection)
         }
         
         // Feature sections
         for featureSection in entity.featureSections {
-            generateFeatureSection(featureSection)
+            formatFeatureSection(featureSection)
         }
         
         output.append("")
     }
     
-    private func generateField(_ field: Field) -> String {
+    private func formatField(_ field: Field) -> String {
         let prefixString = field.prefixes.map { $0.rawValue }.joined()
         let fieldNamesString = field.names.joined(separator: ", ")
-        let dataTypeString = generateDataType(field.dataType)
-        let constraintString = generateConstraints(field.constraints)
+        let dataTypeString = formatDataType(field.dataType)
+        let constraintString = formatConstraints(field.constraints)
         
         // Calculate spacing
         let fieldPart = "\(prefixString) \(fieldNamesString)"
@@ -260,29 +260,29 @@ public class DBSoupGenerator {
         return line
     }
     
-    private func generateDataType(_ dataType: DataType) -> String {
+    private func formatDataType(_ dataType: DataType) -> String {
         switch dataType {
         case .simple(let type):
             return type
         case .parametric(let type, let params):
             return "\(type)(\(params.joined(separator: ", ")))"
         case .array(let innerType):
-            return "Array<\(generateDataType(innerType))>"
+            return "Array<\(formatDataType(innerType))>"
         case .jsonObject(let fields):
             if fields.isEmpty {
                 return "JSON"
             } else {
-                let fieldStrings = fields.map { "\($0.name): \(generateDataType($0.dataType))" }
+                let fieldStrings = fields.map { "\($0.name): \(formatDataType($0.dataType))" }
                 return "JSON {\n\(fieldStrings.joined(separator: ",\n"))\n}"
             }
         case .relationshipArray(let entityName, let cardinality):
-            return "\(entityName)[\(generateCardinality(cardinality))]"
+            return "\(entityName)[\(formatCardinality(cardinality))]"
         case .embeddedEntity(let entityName):
             return entityName
         }
     }
     
-    private func generateCardinality(_ cardinality: Cardinality) -> String {
+    private func formatCardinality(_ cardinality: Cardinality) -> String {
         let maxString: String
         switch cardinality.max {
         case .number(let max):
@@ -293,7 +293,7 @@ public class DBSoupGenerator {
         return "\(cardinality.min)..\(maxString)"
     }
     
-    private func generateConstraints(_ constraints: [Constraint]) -> String {
+    private func formatConstraints(_ constraints: [Constraint]) -> String {
         if constraints.isEmpty {
             return ""
         }
@@ -309,7 +309,7 @@ public class DBSoupGenerator {
         return "[\(constraintStrings.joined(separator: ","))]"
     }
     
-    private func generateRelationshipSection(_ section: RelationshipSection) {
+    private func formatRelationshipSection(_ section: RelationshipSection) {
         output.append("# RELATIONSHIPS")
         
         for relationship in section.relationships {
@@ -327,7 +327,7 @@ public class DBSoupGenerator {
         output.append("")
     }
     
-    private func generateFeatureSection(_ section: FeatureSection) {
+    private func formatFeatureSection(_ section: FeatureSection) {
         output.append("# \(section.title)")
         
         for line in section.content {
@@ -341,15 +341,15 @@ public class DBSoupGenerator {
 // MARK: - Pretty Printer
 
 public class DBSoupPrettyPrinter {
-    private let config: DBSoupGeneratorConfig
+    private let config: DBSoupFormatterConfig
     
-    public init(config: DBSoupGeneratorConfig = .default) {
+    public init(config: DBSoupFormatterConfig = .default) {
         self.config = config
     }
     
     public func prettyPrint(_ document: DBSoupDocument) -> String {
-        let generator = DBSoupGenerator(config: config)
-        return generator.generate(document: document)
+        let formatter = DBSoupFormatter(config: config)
+        return formatter.format(document: document)
     }
     
     public func prettyPrintToFile(_ document: DBSoupDocument, path: String) throws {

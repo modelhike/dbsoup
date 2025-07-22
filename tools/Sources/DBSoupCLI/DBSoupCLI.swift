@@ -209,15 +209,15 @@ class DBSoupCLI {
     private func formatFile(_ filePath: String, outputPath: String?) throws {
         let document = try loadAndParseFile(filePath)
         
-        let config = DBSoupGeneratorConfig(
+        let config = DBSoupFormatterConfig(
             fieldNameWidth: 20,
             dataTypeWidth: 25,
             constraintColumnStart: 45,
             includeComments: true
         )
         
-        let generator = DBSoupGenerator(config: config)
-        let formattedContent = generator.generate(document: document)
+        let formatter = DBSoupFormatter(config: config)
+        let formattedContent = formatter.format(document: document)
         
         if let outputPath = outputPath {
             do {

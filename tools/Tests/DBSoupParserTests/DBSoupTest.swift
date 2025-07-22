@@ -1,4 +1,5 @@
 import Foundation
+@testable import DBSoupParser
 
 // MARK: - Test Framework
 
@@ -13,13 +14,13 @@ class DBSoupTest {
         print("")
         
         // Run individual test methods
-        testBasicParsing()
-        testRelationshipParsing()
-        testFieldParsing()
-        testDataTypeParsing()
-        testValidation()
-        testGeneration()
-        testStatistics()
+            testBasicParsing()
+            testRelationshipParsing()
+            testFieldParsing()
+            testDataTypeParsing()
+            testValidation()
+            testFormatting()
+            testStatistics()
         
         printSummary()
     }
@@ -256,8 +257,8 @@ class DBSoupTest {
         }
     }
     
-    private func testGeneration() {
-        printTestHeader("Generation")
+    private func testFormatting() {
+        printTestHeader("Formatting")
         
         let inputDBSoup = """
         @test.dbsoup
@@ -273,12 +274,12 @@ class DBSoupTest {
         * name : String
         """
         
-        test("Generate DBSoup from parsed document") {
+        test("Format DBSoup from parsed document") {
             let parser = DBSoupParser(content: inputDBSoup)
             let document = try parser.parse()
             
-            let generator = DBSoupGenerator()
-            let output = generator.generate(document: document)
+            let formatter = DBSoupFormatter()
+            let output = formatter.format(document: document)
             
             assert(output.contains("@test.dbsoup"), "Output should contain header")
             assert(output.contains("=== DATABASE SCHEMA ==="), "Output should contain schema section")
@@ -355,9 +356,13 @@ class DBSoupTest {
         }
     }
     
-    private func assert(_ condition: Bool, _ message: String) throws {
-        if !condition {
-            throw TestError(message)
+    private func assert(_ condition: Bool, _ message: String) {
+        testCount += 1
+        if condition {
+            passedTests += 1
+        } else {
+            failedTests += 1
+            print("  ❌ FAILED: \(message)")
         }
     }
     
