@@ -206,7 +206,9 @@ public class DBSoupSVGGenerator {
         .interactive-field:hover ~ .tooltip-group .tooltip-bg,
         .interactive-field:hover ~ .tooltip-group .tooltip-text,
         .field-with-tooltip:hover .tooltip-bg,
-        .field-with-tooltip:hover .tooltip-text {
+        .field-with-tooltip:hover .tooltip-text,
+        .constraint-tag-with-tooltip:hover .tooltip-bg,
+        .constraint-tag-with-tooltip:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
         }
@@ -214,7 +216,7 @@ public class DBSoupSVGGenerator {
         .legend-header { fill: url(#legendHeaderGradient); stroke: #16a085; stroke-width: 0; border-bottom: 1px solid #34495e; }
         .legend-title { font-family: Arial, sans-serif; font-size: 19px; font-weight: 900; fill: white; letter-spacing: 1.2px; }
         .legend-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 11px; font-weight: bold; fill: #ecf0f1; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
-        .legend-header-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 11px; font-weight: 900; fill: #bdc3c7; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
+                        .legend-header-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 11px; font-weight: 900; fill: #666666; }
         .legend-row-bg { fill: rgba(255,255,255,0.03); opacity: 1; }
         .legend-row { fill: none; stroke: #455a64; stroke-width: 1; opacity: 0.8; stroke-dasharray: 2,2; }
         .header-separator { stroke: #34495e; stroke-width: 1; opacity: 0.8; }
@@ -226,11 +228,50 @@ public class DBSoupSVGGenerator {
         .module-link:hover { fill: #2980b9; }
         .module-tag { font-family: Arial, sans-serif; font-size: 11px; font-weight: 500; fill: #2980b9; }
         .module-tag:hover { fill: #1a5999; }
-        .version-text { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
-        .constraint-tag-bg { fill: rgba(149, 165, 166, 0.15); stroke: rgba(149, 165, 166, 0.3); stroke-width: 0.5; transition: fill 0.2s ease, stroke 0.2s ease; }
-        .constraint-tag-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 9px; font-weight: normal; fill: #7f8c8d; transition: fill 0.2s ease, font-weight 0.2s ease; }
-        .constraint-tag:hover .constraint-tag-bg { fill: rgba(52, 73, 94, 0.9); stroke: #2c3e50; stroke-width: 1.5; }
-        .constraint-tag:hover .constraint-tag-text { fill: white; font-weight: bold; }
+                        .version-text { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #2c3e50; }
+                .database-name-text { font-family: Arial, sans-serif; font-size: 20px; font-weight: 900; fill: #34495e; letter-spacing: 1.5px; }
+                        /* Enhanced Color-Coded Constraint Tags */
+                .constraint-tag-bg { transition: fill 0.2s ease, stroke 0.2s ease; }
+                .constraint-tag-text { font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; font-size: 11px; font-weight: 500; transition: fill 0.2s ease, font-weight 0.2s ease; }
+                
+                                /* Default value tags - Orange border */
+                .tag-default { fill: rgba(230, 126, 34, 0.15); stroke: #e67e22; stroke-width: 0.4; }
+                .tag-default-text { fill: #d35400; font-weight: 600; font-size: 11px; }
+                
+                /* App/JSON field name tags - Green border (both use same styling) */
+                .tag-app { fill: rgba(46, 204, 113, 0.15); stroke: #27ae60; stroke-width: 0.4; }
+                .tag-app-text { fill: #1e8449; font-weight: 600; font-size: 11px; }
+                
+                /* Constraint tags - Blue border */
+                .tag-constraint { fill: rgba(52, 152, 219, 0.15); stroke: #3498db; stroke-width: 0.4; }
+                .tag-constraint-text { fill: #2980b9; font-weight: 600; font-size: 11px; }
+                
+                /* FK tags - Special styling for foreign keys */
+                .tag-fk { fill: rgba(52, 152, 219, 0.15); stroke: #3498db; stroke-width: 0.4; }
+                .tag-fk-text { fill: #2980b9; font-weight: 600; font-size: 10px; }
+                
+                /* Encrypted tags - Red border (matches sensitive fields) */
+                .tag-encrypted { fill: rgba(255, 71, 87, 0.15); stroke: #ff4757; stroke-width: 0.4; }
+                .tag-encrypted-text { fill: #c0392b; font-weight: 600; font-size: 11px; }
+                
+                /* System/Auto tags - Dark gray border */
+                .tag-system { fill: rgba(52, 73, 94, 0.15); stroke: #34495e; stroke-width: 0.6; }
+                .tag-system-text { fill: #999999; font-weight: 600; font-size: 11px; }
+                
+                /* Enhanced hover effects for all tag types */
+                .constraint-tag:hover .tag-default, 
+                .constraint-tag:hover .tag-app,
+                .constraint-tag:hover .tag-constraint,
+                .constraint-tag:hover .tag-fk,
+                .constraint-tag:hover .tag-encrypted,
+                .constraint-tag:hover .tag-system { fill: rgba(52, 73, 94, 0.9); stroke: #2c3e50; stroke-width: 1.5; }
+                
+                .constraint-tag:hover .tag-default-text,
+                .constraint-tag:hover .tag-app-text,
+                .constraint-tag:hover .tag-constraint-text,
+                .constraint-tag:hover .tag-fk-text,
+                .constraint-tag:hover .tag-encrypted-text,
+                .constraint-tag:hover .tag-system-text { fill: white; font-weight: bold; }
         .constraint-tag:hover { cursor: none; }
         .browser-message { opacity: 1; transition: opacity 0.3s ease; }
         .browser-message:hover { opacity: 0.6; }
@@ -266,7 +307,7 @@ public class DBSoupSVGGenerator {
         for moduleInfo in entitiesByModule {
             // Generate standard entities first
             for entity in moduleInfo.standardEntities {
-                svg += generateEntityBox(entity: entity, layout: layout)
+            svg += generateEntityBox(entity: entity, layout: layout)
             }
             // Then embedded entities
             for entity in moduleInfo.embeddedEntities {
@@ -546,24 +587,169 @@ public class DBSoupSVGGenerator {
         var tagSvg = ""
         
         for constraint in field.constraints {
-            let tagText = constraint.name.lowercased()
-            let tagWidth = max(tagText.count * 6 + 8, 24) // Min width 24px
-            let tagHeight = 10
+            let (displayText, tagCategory) = getSmartDisplayText(constraint: constraint)
             
-            tagSvg += """
-            <g class="constraint-tag">
-                <rect x="\(tagX)" y="\(y - 8)" width="\(tagWidth)" height="\(tagHeight)" 
-                      class="constraint-tag-bg" rx="5"/>
-                <text x="\(tagX + tagWidth/2)" y="\(y - 3)" class="constraint-tag-text" 
-                      text-anchor="middle" dominant-baseline="middle">\(xmlEscape(tagText))</text>
-            </g>
+            // Special handling for FK tags - smaller font and reduced padding
+            let isFKTag = displayText.starts(with: "fk -") || displayText == "fk"
+            let isEnumTag = constraint.name.lowercased() == "enum"
+            let bgClass: String
+            let textClass: String
+            let tagWidth: Int
+            let tagHeight: Int
             
-            """
+            if isFKTag {
+                // FK tag optimization: 10px font, minimal padding
+                let baseCharWidth = 5  // Tighter character width for 10px font
+                let padding = 2        // Minimal padding for FK tags
+                let minWidth = 16      // Minimum width for 10px readability
+                bgClass = "tag-fk"
+                textClass = "tag-fk-text"
+                tagWidth = max(displayText.count * baseCharWidth + padding, minWidth)
+                tagHeight = 12
+            } else {
+                // Regular constraint tags: 11px font
+                let baseCharWidth = 7  // Character width for 11px font
+                let padding = 6        // Standard padding
+                let minWidth = 22      // Minimum width for 11px readability
+                let (bg, text) = getTagClasses(category: tagCategory)
+                bgClass = bg
+                textClass = text
+                tagWidth = max(displayText.count * baseCharWidth + padding, minWidth)
+                tagHeight = 12
+            }
             
-            tagX += tagWidth + 4 // Space between tags
+            // Add tooltip for enum tags
+            if isEnumTag, let enumValue = constraint.value {
+                let tooltipText = "Valid values: \(enumValue)"
+                let tooltipPadding = 8
+                let tooltipHeight = 20
+                let tooltipWidth = max(tooltipText.count * 8 + (tooltipPadding * 2), 80)
+                
+                let tooltipX = tagX + (tagWidth / 2) - (tooltipWidth / 2)
+                let tooltipY = y - 35 // Above the tag
+                let textCenterX = tooltipX + (tooltipWidth / 2)
+                let textCenterY = tooltipY + (tooltipHeight / 2) + 4
+                
+                tagSvg += """
+                <g class="constraint-tag-with-tooltip">
+                    <rect x="\(tagX)" y="\(y - 9)" width="\(tagWidth)" height="\(tagHeight)" 
+                          class="\(bgClass)" rx="3"/>
+                    <text x="\(tagX + tagWidth/2)" y="\(y - 3)" class="\(textClass)" 
+                          text-anchor="middle" dominant-baseline="central">\(xmlEscape(displayText))</text>
+                    
+                    <g class="tooltip-group">
+                        <rect x="\(tooltipX)" y="\(tooltipY)" width="\(tooltipWidth)" height="\(tooltipHeight)" class="tooltip-bg"/>
+                        <text x="\(textCenterX)" y="\(textCenterY)" text-anchor="middle" class="tooltip-text">\(xmlEscape(tooltipText))</text>
+                    </g>
+                </g>
+                
+                """
+            } else {
+                tagSvg += """
+                <g class="constraint-tag">
+                    <rect x="\(tagX)" y="\(y - 9)" width="\(tagWidth)" height="\(tagHeight)" 
+                          class="\(bgClass)" rx="3"/>
+                    <text x="\(tagX + tagWidth/2)" y="\(y - 3)" class="\(textClass)" 
+                          text-anchor="middle" dominant-baseline="central">\(xmlEscape(displayText))</text>
+                </g>
+                
+                """
+            }
+            
+            tagX += tagWidth + 3 // Compact spacing for tighter tags
         }
         
         return tagSvg
+    }
+    
+    private func getSmartDisplayText(constraint: Constraint) -> (text: String, category: TagCategory) {
+        let constraintName = constraint.name.lowercased()
+        
+        // Handle different constraint types with smart transformations
+        switch constraintName {
+        case "default":
+            if let value = constraint.value {
+                if value == "CURRENT_TIMESTAMP" {
+                    return ("• now", .system)
+                } else {
+                    // Show full default values (no truncation for strings like 'pending_approval')
+                    return (value, .default)
+                }
+            }
+            return ("default", .default)
+            
+        case "app":
+            if let value = constraint.value {
+                return ("app: \(value)", .app)
+            }
+            return ("app", .app)
+            
+        case "json":
+            if let value = constraint.value {
+                return ("json: \(value)", .app)  // Use .app category for same green styling
+            }
+            return ("json", .app)
+            
+        case "fk":
+            if let value = constraint.value,
+               let dotIndex = value.firstIndex(of: ".") {
+                let entityName = String(value[..<dotIndex])
+                // Always show full FK entity name with optimized spacing
+                return ("fk - \(entityName)", .constraint)
+            }
+            return ("fk", .constraint)
+            
+        case "enum":
+            return ("enum", .constraint)
+            
+        case "pk":
+            return ("pk", .constraint)
+            
+        case "index", "idx":
+            return ("idx", .constraint)
+            
+        case "unique", "uk":
+            return ("uk", .constraint)
+            
+        case "encrypted":
+            return ("enc", .encrypted)
+            
+        case "system":
+            return ("sys", .system)
+            
+        case "auto", "auto_increment":
+            return ("auto", .system)
+            
+        default:
+            // Other constraints - show as lowercase
+            if let value = constraint.value {
+                return ("\(constraintName): \(value)", .constraint)
+            }
+            return (constraintName, .constraint)
+        }
+    }
+    
+    private func getTagClasses(category: TagCategory) -> (bgClass: String, textClass: String) {
+        switch category {
+        case .default:
+            return ("tag-default", "tag-default-text")
+        case .app:
+            return ("tag-app", "tag-app-text")
+        case .constraint:
+            return ("tag-constraint", "tag-constraint-text")
+        case .encrypted:
+            return ("tag-encrypted", "tag-encrypted-text")
+        case .system:
+            return ("tag-system", "tag-system-text")
+        }
+    }
+    
+    enum TagCategory {
+        case `default`    // Orange - default values
+        case app         // Green - app/JSON field names (both use same styling)
+        case constraint  // Blue - database constraints
+        case encrypted   // Red - encrypted/sensitive attributes
+        case system      // Gray - system/auto values
     }
     
     private func formatDataType(_ dataType: DataType) -> String {
@@ -732,7 +918,7 @@ public class DBSoupSVGGenerator {
         let overviewWidth = legendWidth  // Same width as legend
         
         // Calculate color legend position (below overview, same width)
-        let colorLegendHeight = 100  // Better fit for content
+        let colorLegendHeight = 240  // Fits all field types and attribute colors sections
         let colorLegendX = overviewX
         let colorLegendY = overviewY + (overviewHeight - 20) + 20  // 20px gap below overview (accounting for overview height adjustment)
         let colorLegendWidth = overviewWidth  // Same width as overview
@@ -904,10 +1090,34 @@ public class DBSoupSVGGenerator {
         let height = layout.versionHeight
         
         let version = document.yamlHeader?.version ?? "Unknown"
+        let dbname = document.yamlHeader?.dbname
         
-        let versionDisplay = """
+        var versionDisplay = """
         <g class="version-display">
-        <text x="\(x + width/2)" y="\(y + height/2 + 4)" class="version-text" text-anchor="middle">\(DBSoupSVGGenerator.schemaVersionLabel)\(xmlEscape(version))</text>
+        
+        """
+        
+        if let dbname = dbname {
+            // Database name at the top
+            versionDisplay += """
+            <text x="\(x + width/2)" y="\(y + 8)" class="database-name-text" text-anchor="middle">\(xmlEscape(dbname))</text>
+            
+            """
+            
+            // Version text below database name
+            versionDisplay += """
+            <text x="\(x + width/2)" y="\(y + height/2 + 12)" class="version-text" text-anchor="middle">\(DBSoupSVGGenerator.schemaVersionLabel)\(xmlEscape(version))</text>
+            
+            """
+        } else {
+            // Only version text (centered as before)
+            versionDisplay += """
+            <text x="\(x + width/2)" y="\(y + height/2 + 4)" class="version-text" text-anchor="middle">\(DBSoupSVGGenerator.schemaVersionLabel)\(xmlEscape(version))</text>
+            
+            """
+        }
+        
+        versionDisplay += """
         </g>
         
         """
@@ -1263,30 +1473,69 @@ public class DBSoupSVGGenerator {
         <g class="color-legend">
             <rect x="\(x)" y="\(y)" width="\(width)" height="\(height)" 
                   fill="url(#overviewGradient)" stroke="#2c3e50" stroke-width="2" rx="8"/>
-            <text x="\(x + width/2)" y="\(y + 20)" class="overview-title" text-anchor="middle">Field Color Legend</text>
+            <text x="\(x + width/2)" y="\(y + 20)" class="overview-title" text-anchor="middle">Color Legend</text>
         
         """
         
-        let colorItems = [
-            ("Required Fields", "*", "#ffa502", "orange"),
-            ("Optional Fields", "-", "#c7c7c7", "gray"),
-            ("Indexed Fields", "@", "#5352ed", "blue"),
-            ("Sensitive Fields", "#", "#ff4757", "red"),
-            ("Foreign Keys", "FK", "#e056fd", "purple"),
-            ("Embedded References", "ERF", "#ffeb3b", "yellow")
+        // Field-level colors (text colors)
+        let fieldColors = [
+            ("Required Fields", "*", "#ffa502"),
+            ("Optional Fields", "—", "#8e8e93"),
+            ("Indexed Fields", "!", "#5352ed"),
+            ("Sensitive Fields", "@", "#ff4757"),
+            ("Primary Key Fields", "pk", "#007aff"),
+            ("Foreign Key Fields", "fk", "#5856d6")
         ]
         
-        let baseY = y + headerHeight + 5  // Reduced gap since headerHeight increased
+        // Attribute colors (tag colors)  
+        let attributeColors = [
+            ("Default Values", "def", "#e67e22"),
+            ("App/JSON Fields", "app", "#27ae60"), 
+            ("DB Constraints", "pk", "#3498db"),
+            ("Encrypted Fields", "enc", "#ff4757"),
+            ("System Values", "sys", "#34495e")
+        ]
         
-        for (index, (label, symbol, color, _)) in colorItems.enumerated() {
+        var currentY = y + headerHeight + 5
+        
+        // Field Colors Section
+        legend += """
+        <text x="\(x + padding)" y="\(currentY + 10)" class="legend-header-text" font-size="12px" font-weight="700">Field Level Colors</text>
+        
+        """
+        currentY += 25
+        
+        for (index, (label, symbol, color)) in fieldColors.enumerated() {
             let row = index / 2  // 2 columns
             let col = index % 2
             let itemX = x + padding + (col * (width - 2 * padding) / 2)
-            let itemY = baseY + (row * lineHeight)
+            let itemY = currentY + (row * lineHeight)
             
             legend += """
-            <circle cx="\(itemX + 8)" cy="\(itemY - 3)" r="6" fill="\(color)" stroke="#333" stroke-width="1"/>
-            <text x="\(itemX + 20)" y="\(itemY - 3)" class="overview-detail" font-size="11px" dominant-baseline="middle">\(xmlEscape(symbol)) - \(xmlEscape(label))</text>
+            <circle cx="\(itemX + 8)" cy="\(itemY - 3)" r="5" fill="\(color)" stroke="none"/>
+            <text x="\(itemX + 18)" y="\(itemY - 3)" class="overview-detail" font-size="10px" dominant-baseline="middle">\(xmlEscape(symbol)) - \(xmlEscape(label))</text>
+            
+            """
+        }
+        
+        currentY += (fieldColors.count + 1) / 2 * lineHeight + 15
+        
+        // Attribute Colors Section
+        legend += """
+        <text x="\(x + padding)" y="\(currentY + 10)" class="legend-header-text" font-size="12px" font-weight="700">Field Attribute Colors</text>
+        
+        """
+        currentY += 25
+        
+        for (index, (label, symbol, color)) in attributeColors.enumerated() {
+            let row = index / 2  // 2 columns
+            let col = index % 2
+            let itemX = x + padding + (col * (width - 2 * padding) / 2)
+            let itemY = currentY + (row * lineHeight)
+            
+            legend += """
+            <rect x="\(itemX + 3)" y="\(itemY - 8)" width="20" height="10" fill="\(color)" stroke="rgba(52, 73, 94, 0.8)" stroke-width="0.8" rx="4"/>
+            <text x="\(itemX + 27)" y="\(itemY - 3)" class="overview-detail" font-size="10px" dominant-baseline="middle">\(xmlEscape(symbol)) - \(xmlEscape(label))</text>
             
             """
         }
