@@ -238,17 +238,17 @@ public class DBSoupSVGGenerator {
                 .tag-default { fill: rgba(230, 126, 34, 0.15); stroke: #e67e22; stroke-width: 0.4; }
                 .tag-default-text { fill: #d35400; font-weight: 600; font-size: 11px; }
                 
-                /* App/JSON field name tags - Green border (both use same styling) */
-                .tag-app { fill: rgba(46, 204, 113, 0.15); stroke: #27ae60; stroke-width: 0.4; }
-                .tag-app-text { fill: #1e8449; font-weight: 600; font-size: 11px; }
+                            /* App/JSON field name tags - Green background with muted text for subtle legibility */
+            .tag-app { fill: rgba(46, 204, 113, 0.8); stroke: #27ae60; stroke-width: 0.4; }
+            .tag-app-text { fill: #f0f0f0; font-weight: 600; font-size: 11px; }
                 
                 /* Constraint tags - Blue border */
                 .tag-constraint { fill: rgba(52, 152, 219, 0.15); stroke: #3498db; stroke-width: 0.4; }
                 .tag-constraint-text { fill: #2980b9; font-weight: 600; font-size: 11px; }
                 
-                /* FK tags - Medium purple for legible visual hierarchy */
-                .tag-fk { fill: rgba(168, 85, 205, 0.15); stroke: #a855cd; stroke-width: 0.4; }
-                .tag-fk-text { fill: #a855cd; font-weight: 600; font-size: 11px; }
+                /* FK tags - Muted gray text on dark purple for subtle, professional appearance */
+                .tag-fk { fill: #8e24aa; stroke: #8e24aa; stroke-width: 0.4; }
+                .tag-fk-text { fill: #cccccc; font-weight: 600; font-size: 11px; }
                 
                 /* Encrypted tags - Red border (matches sensitive fields) */
                 .tag-encrypted { fill: rgba(255, 71, 87, 0.15); stroke: #ff4757; stroke-width: 0.4; }
@@ -669,8 +669,8 @@ public class DBSoupSVGGenerator {
         switch constraintName {
         case "default":
             if let value = constraint.value {
-                if value == "CURRENT_TIMESTAMP" {
-                    return ("• now", .system)
+                        if value == "CURRENT_TIMESTAMP" {
+            return ("• now", .default)
                 } else {
                     // Show full default values (no truncation for strings like 'pending_approval')
                     return (value, .default)
@@ -918,7 +918,7 @@ public class DBSoupSVGGenerator {
         let overviewWidth = legendWidth  // Same width as legend
         
         // Calculate color legend position (below overview, same width)
-        let colorLegendHeight = 240  // Fits all field types and attribute colors sections
+        let colorLegendHeight = 250  // Fits all field types and attribute colors sections (including FK tags)
         let colorLegendX = overviewX
         let colorLegendY = overviewY + (overviewHeight - 20) + 20  // 20px gap below overview (accounting for overview height adjustment)
         let colorLegendWidth = overviewWidth  // Same width as overview
@@ -1004,10 +1004,13 @@ public class DBSoupSVGGenerator {
         let padding = 12
         let minWidth = 240
         
-        // Calculate width based on longest field text
+        // Calculate width based on field text + constraint tags for each field
         let maxFieldWidth = entity.fields.map { field in
             let fieldText = formatFieldText(field: field)
-            return fieldText.count * 7 + padding * 2 // Approximate character width
+            let fieldTextWidth = fieldText.count * 7
+            let constraintTagsWidth = calculateConstraintTagsWidth(for: field)
+            let tagSpacing = constraintTagsWidth > 0 ? 8 : 0 // Spacing between field text and tags
+            return fieldTextWidth + tagSpacing + constraintTagsWidth + padding * 2
         }.max() ?? 0
         
         let titleWidth = entity.name.count * 10 + padding * 2
@@ -1019,6 +1022,38 @@ public class DBSoupSVGGenerator {
         let height = headerHeight + fieldsHeight + 30 // Extra padding
         
         return (width: width, height: height)
+    }
+    
+    private func calculateConstraintTagsWidth(for field: Field) -> Int {
+        guard !field.constraints.isEmpty else { return 0 }
+        
+        var totalWidth = 0
+        for (index, constraint) in field.constraints.enumerated() {
+            let (displayText, _) = getSmartDisplayText(constraint: constraint)
+            let isFKTag = displayText.starts(with: "fk -") || displayText == "fk"
+            
+            let tagWidth: Int
+            if isFKTag {
+                // FK tag calculation: smaller font and minimal padding
+                let baseCharWidth = 5
+                let padding = 2
+                let minWidth = 16
+                tagWidth = max(displayText.count * baseCharWidth + padding, minWidth)
+            } else {
+                // Regular constraint tag calculation: standard font
+                let baseCharWidth = 7
+                let padding = 6
+                let minWidth = 22
+                tagWidth = max(displayText.count * baseCharWidth + padding, minWidth)
+            }
+            
+            totalWidth += tagWidth
+            if index < field.constraints.count - 1 {
+                totalWidth += 3 // Spacing between tags
+            }
+        }
+        
+        return totalWidth
     }
     
     private func calculateLegendHeight(relationships: [Relationship]) -> Int {
@@ -1477,21 +1512,21 @@ public class DBSoupSVGGenerator {
         
         """
         
-        // Field-level colors (text colors)
+        // Field-level colors (text colors) - match actual CSS field colors
         let fieldColors = [
             ("Required Fields", "*", "#ffa502"),
-            ("Optional Fields", "—", "#8e8e93"),
+            ("Optional Fields", "—", "#c7c7c7"),
             ("Indexed Fields", "!", "#5352ed"),
             ("Sensitive Fields", "@", "#ff4757"),
-            ("Primary Key Fields", "pk", "#007aff"),
-            ("Foreign Key Fields", "fk", "#5856d6")
+            ("Foreign Key Fields", "fk", "#e056fd")
         ]
         
         // Attribute colors (tag colors)  
         let attributeColors = [
+            ("Foreign Key Tags", "fk", "#8e24aa"),
             ("Default Values", "def", "#e67e22"),
             ("App/JSON Fields", "app", "#27ae60"), 
-            ("DB Constraints", "pk", "#3498db"),
+            ("DB Constraints", "con", "#3498db"),
             ("Encrypted Fields", "enc", "#ff4757"),
             ("System Values", "sys", "#34495e")
         ]
