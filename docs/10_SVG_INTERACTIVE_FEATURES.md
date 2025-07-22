@@ -164,11 +164,12 @@ DBSoup SVG diagrams now include **compact, color-coded attribute tags** that dis
 
 ### Tag Types and Interactions
 
-#### Foreign Key Tags (Purple)
-- **Visual**: `[fk - EntityName]` with purple styling
+#### Foreign Key Tags (Muted Gray on Dark Purple)
+- **Visual**: `[fk - EntityName]` with **muted gray text (`#cccccc`)** on dark purple background (`#8e24aa`) for **subtle professional appearance**
 - **Interactive**: Clickable navigation to referenced entity
 - **Hover**: Instant tooltip showing entity name
 - **Special**: Uses consistent font (11px) and minimal padding for compactness
+- **Professional Design**: Muted gray-on-dark-purple creates confident, modern look with excellent readability and easy-on-the-eyes appearance
 
 #### Enum Constraint Tags (Blue)  
 - **Visual**: `[enum]` with blue styling
@@ -177,10 +178,15 @@ DBSoup SVG diagrams now include **compact, color-coded attribute tags** that dis
 - **Performance**: Instant 0.1s fade-in tooltip
 
 #### System Attribute Tags (Dark Gray)
-- **Visual**: Special symbols like `[• now]` for datetime fields
-- **Features**: Uses bright dot (•) instead of distracting clock icon
+- **Visual**: Special symbols like `[auto]`, `[sys]` for system-managed fields
 - **Purpose**: Quick identification of auto-generated fields
 - **Color**: Lighter gray text (#999999) for better legibility
+
+#### Datetime Default Tags (Orange)
+- **Visual**: Special symbol `[• now]` for CURRENT_TIMESTAMP fields
+- **Features**: Uses bright dot (•) instead of distracting clock icon
+- **Logic**: Uses default tag styling since CURRENT_TIMESTAMP represents a default value
+- **Color**: Orange background matching other default value tags
 
 #### Other Tag Types
 - **Encrypted Tags**: `[encrypted]` in red, matching sensitive field colors

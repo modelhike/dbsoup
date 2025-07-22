@@ -52,11 +52,12 @@ The DBSoup SVG generator displays field constraints as compact, color-coded attr
 ### Attribute Tag Color Palette
 | Tag Type | Background | Border | Text Color | Usage |
 |----------|------------|--------|------------|-------|
-| **Foreign Key** | `rgba(224, 86, 253, 0.15)` | `#e056fd` | `#e056fd` | `[FK:Entity.field]` constraints **[Clickable]** |
+| **Foreign Key** | `#8e24aa` | `#8e24aa` | `#cccccc` | `[FK:Entity.field]` constraints **[Clickable]** - muted gray text on dark purple for subtle professional appearance |
+| **App/JSON** | `rgba(46, 204, 113, 0.8)` | `#27ae60` | `#ffffff` | `[app:field]`, `[json:field]` field mapping constraints - white text on solid green for maximum legibility |
 | **Enum** | `rgba(41, 128, 185, 0.15)` | `#2980b9` | `#2980b9` | `[ENUM:values]` constraints **[Hover Tooltip]** |
-| **System** | `rgba(52, 73, 94, 0.15)` | `#34495e` | `#999999` | `[SYSTEM]`, `[AUTO]` constraints |
+| **System** | `rgba(52, 73, 94, 0.15)` | `#34495e` | `#999999` | `[SYSTEM]`, `[AUTO]` constraints (except CURRENT_TIMESTAMP) |
 | **Encrypted** | `rgba(255, 71, 87, 0.15)` | `#ff4757` | `#c0392b` | `[ENCRYPTED]` constraints |
-| **Default** | `rgba(211, 84, 0, 0.15)` | `#d35400` | `#d35400` | `[DEFAULT:value]` constraints |
+| **Default** | `rgba(211, 84, 0, 0.15)` | `#d35400` | `#d35400` | `[DEFAULT:value]` constraints, including `• now` for CURRENT_TIMESTAMP |
 
 ### Attribute Tag Features
 - **Compact Design**: Small, rounded tags (11px font, 12px height) that don't overwhelm field text
@@ -64,7 +65,7 @@ The DBSoup SVG generator displays field constraints as compact, color-coded attr
 - **Interactive Elements**: 
   - FK tags are clickable for navigation
   - Enum tags show hover tooltips with valid values
-  - System tags use special symbols (• for datetime fields)
+  - Default tags use special symbols (• for CURRENT_TIMESTAMP datetime fields)
 - **Visual Hierarchy**: Tags complement field colors without conflicting
 
 ### Embedded Entity Fields
@@ -205,7 +206,8 @@ Displays the color coding for field prefixes and field types:
 
 ### Field Attribute Colors (Rectangle Swatches)
 Displays the color coding for attribute tags that appear next to fields:
-- **Foreign Key Attributes** (Purple rectangle): `[fk - EntityName]` tags
+- **Foreign Key Attributes** (Dark purple rectangle with muted gray text): `[fk - EntityName]` tags with subtle professional appearance
+- **App/JSON Attributes** (Solid green rectangle with white text): `[app: field]`, `[json: field]` field mapping tags with maximum legibility
 - **Enum Attributes** (Blue rectangle): `[enum]` tags with hover tooltips
 - **System Attributes** (Dark gray rectangle): `[• now]`, `[auto]`, `[sys]` tags
 - **Encrypted Attributes** (Red rectangle): `[encrypted]` tags

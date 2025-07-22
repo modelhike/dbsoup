@@ -14,20 +14,37 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 
 ### Tag Categories
 
-#### 1. **Foreign Key Tags** (Purple)
+#### 1. **Foreign Key Tags** (Muted Gray on Dark Purple)
 - **Display**: `fk - EntityName` (lowercase)
-- **Color**: Purple background (`#e056fd`) with purple border
+- **Color**: Dark purple background (`#8e24aa`) with dark purple border (`#8e24aa`) and **muted gray text (`#cccccc`)**
 - **Special Features**:
   - Always shows full entity name for clarity
   - Uses optimized font (11px) and minimal padding for compactness
   - Clickable navigation to referenced entity
   - Instant hover tooltip showing entity name
+  - **Subtle elegance**: Muted gray text provides excellent readability without brightness
+  - **Professional appearance**: Solid dark background creates a confident, modern look
+  - **Easy on the eyes**: Softer gray text reduces visual strain while maintaining clarity
 
 ```dbsoup
 - user_id : ObjectId [FK:User._id]  # Displays: [fk - User]
 ```
 
-#### 2. **Enum Constraint Tags** (Blue)
+#### 2. **App/JSON Field Tags** (Green with White Text)
+- **Display**: `app: field` or `json: field` (lowercase with field mapping)
+- **Color**: Solid green background (`rgba(46, 204, 113, 0.8)`) with green border (`#27ae60`) and **white text (`#ffffff`)**
+- **Special Features**:
+  - Shows application field mapping or JSON field names
+  - High contrast white text ensures maximum legibility
+  - Professional solid green background for clear visibility
+  - Consistent with modern UI design patterns
+
+```dbsoup
+- UserId : String [APP:OrgId]  # Displays: [app: OrgId]
+- uid : String [JSON:uid]      # Displays: [json: uid]
+```
+
+#### 3. **Enum Constraint Tags** (Blue)
 - **Display**: `enum` (lowercase)
 - **Color**: Blue background (`#2980b9`) with blue border
 - **Special Features**:
@@ -39,17 +56,25 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 - status : String [ENUM:active,inactive,pending]  # Displays: [enum] + hover tooltip
 ```
 
-#### 3. **System Attribute Tags** (Dark Gray)
+#### 4. **System Attribute Tags** (Dark Gray)
 - **Display**: Various system indicators with icons/symbols
 - **Color**: Dark gray background (`#34495e`) with lighter gray text (`#999999`)
 - **Special Indicators**:
-  - `• now` - For `CURRENT_TIMESTAMP` datetime fields (bright dot instead of clock)
   - `auto` - For auto-increment or auto-generated fields
   - `sys` - For other system-managed fields
 
 ```dbsoup
-- created_at : DateTime [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]  # Displays: [• now]
 - id : Int [AUTO_INCREMENT]  # Displays: [auto]
+- updated_at : DateTime [SYSTEM]  # Displays: [sys]
+```
+
+#### 4a. **Special Case: Datetime Default Tags** (Orange)
+- **Display**: `• now` - Uses bright dot symbol for easy identification
+- **Color**: Orange background (`#d35400`) matching default value styling
+- **Logic**: CURRENT_TIMESTAMP represents a default value, so uses default tag colors
+
+```dbsoup
+- created_at : DateTime [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]  # Displays: [• now] in orange
 ```
 
 #### 4. **Encrypted Attribute Tags** (Red)
@@ -62,12 +87,14 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 ```
 
 #### 5. **Default Value Tags** (Orange)
-- **Display**: `default` (lowercase)
+- **Display**: `default` (lowercase) or special symbols for datetime defaults
 - **Color**: Orange background (`#d35400`) with orange text
 - **Purpose**: Indicates fields with default values
+- **Special Symbol**: `• now` for CURRENT_TIMESTAMP datetime defaults
 
 ```dbsoup
 - status : String [DEFAULT:active]  # Displays: [default]
+- created_at : DateTime [DEFAULT:CURRENT_TIMESTAMP]  # Displays: [• now]
 ```
 
 ## 🎨 Visual Specifications
@@ -83,7 +110,7 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 ### Color Palette
 | Tag Type | Background | Border | Text Color |
 |----------|------------|---------|------------|
-| **Foreign Key** | `rgba(224, 86, 253, 0.15)` | `#e056fd` | `#e056fd` |
+| **Foreign Key** | `rgba(224, 86, 253, 0.08)` | `#e056fd` | `#7CB342` *(olive green - muted complementary color to purple)* |
 | **Enum** | `rgba(41, 128, 185, 0.15)` | `#2980b9` | `#2980b9` |
 | **System** | `rgba(52, 73, 94, 0.15)` | `#34495e` | `#999999` |
 | **Encrypted** | `rgba(255, 71, 87, 0.15)` | `#ff4757` | `#c0392b` |
@@ -146,7 +173,7 @@ func getSmartDisplayText(constraint: String, value: String) -> (String, TagCateg
         return ("enum", .constraint)
     case "SYSTEM":
         if value == "CURRENT_TIMESTAMP" {
-            return ("• now", .system)  // Bright dot instead of clock
+            return ("• now", .default)  // Uses default styling since it's a default value
         }
         return ("sys", .system)
     case "ENCRYPTED":

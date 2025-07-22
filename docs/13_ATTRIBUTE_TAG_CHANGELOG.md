@@ -31,10 +31,14 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 
 #### System Attribute Tags (Dark Gray) ✅
 - ✅ Special symbols for different system types
-- ✅ `[• now]` for CURRENT_TIMESTAMP datetime fields (bright dot)
 - ✅ `[auto]` for auto-increment fields
 - ✅ `[sys]` for other system-managed fields
 - ✅ Lighter gray text (#999999) for better legibility
+
+#### Datetime Default Tags (Orange) ✅
+- ✅ `[• now]` for CURRENT_TIMESTAMP datetime fields (bright dot, orange styling)
+- ✅ Uses default tag colors since CURRENT_TIMESTAMP represents a default value
+- ✅ Logical categorization improves visual consistency
 
 #### Encrypted Attribute Tags (Red) ✅
 - ✅ Display format: `[encrypted]` (lowercase)
@@ -89,10 +93,12 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 - System tag text: #2c3e50 → #6c757d → #999999 (final: lighter gray)
 - Default tag text: #c0392b → #d35400 (orange to distinguish from encrypted)
 - Legend headers: shadows removed, color changed to #666666
+- **FK tag styling**: Light purple background (#e056fd) with olive green text (#7CB342) → Dark purple background (#8e24aa) with white text (#ffffff) → Dark purple background (#8e24aa) with muted gray text (#cccccc) (final: professional appearance with subtle elegance)
 
 ### Icon Updates ✅
 - System datetime: clock icon (⏰) → bright dot (•) for subtlety
-- Maintains quick identification while reducing visual noise
+- Logical styling: moved "• now" from system (gray) to default (orange) styling
+- Maintains quick identification while reducing visual noise and improving logical consistency
 
 ### Spacing Refinements ✅
 - Tag positioning: Multiple y-axis adjustments for perfect alignment
@@ -158,7 +164,7 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 1. **Visual Design Excellence**: Balanced compact tags that enhance rather than overwhelm
 2. **Interactive Innovation**: Hover tooltips and clickable navigation add functional value
 3. **Color Theory Application**: Thoughtful color choices that support visual hierarchy
-4. **Legible Hierarchy**: FK tags use medium purple for readable hierarchy with bright FK fields
+4. **Subtle Professional Design**: FK tags use muted gray text (#cccccc) on dark purple background (#8e24aa) - creating sophisticated visual balance with excellent readability and easy-on-the-eyes appearance
 5. **Font Consistency**: All tag types now use 11px font for uniform appearance and readability
 6. **Logical Categorization**: "• now" uses default (orange) styling since it represents default values
 7. **Performance Optimization**: Efficient rendering with smooth animations
