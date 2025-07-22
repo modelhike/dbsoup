@@ -157,10 +157,45 @@ StopAddOn
 5. **Use browser back button** to return to previous location
 6. **Direct linking**: Use `diagram.svg#EntityName` for direct navigation
 
+## 🏷️ Attribute Tag Interactive System
+
+### Feature Description
+DBSoup SVG diagrams now include **compact, color-coded attribute tags** that display field constraints as interactive elements next to field names. These tags provide instant visual feedback and interactive functionality.
+
+### Tag Types and Interactions
+
+#### Foreign Key Tags (Purple)
+- **Visual**: `[fk - EntityName]` with purple styling
+- **Interactive**: Clickable navigation to referenced entity
+- **Hover**: Instant tooltip showing entity name
+- **Special**: Uses smaller font (10px) and minimal padding for compactness
+
+#### Enum Constraint Tags (Blue)  
+- **Visual**: `[enum]` with blue styling
+- **Interactive**: Hover tooltip shows all valid enum values
+- **Format**: "Valid values: value1, value2, value3"
+- **Performance**: Instant 0.1s fade-in tooltip
+
+#### System Attribute Tags (Dark Gray)
+- **Visual**: Special symbols like `[• now]` for datetime fields
+- **Features**: Uses bright dot (•) instead of distracting clock icon
+- **Purpose**: Quick identification of auto-generated fields
+- **Color**: Lighter gray text (#999999) for better legibility
+
+#### Other Tag Types
+- **Encrypted Tags**: `[encrypted]` in red, matching sensitive field colors
+- **Default Value Tags**: `[default]` in orange for fields with default values
+
+### Interactive Features
+- **Hover Effects**: Subtle brightness boost with smooth 0.2s transitions
+- **Navigation**: FK tags navigate using `#EntityName` anchors
+- **Tooltips**: Professional dark background with white text and drop shadows
+- **Visual Feedback**: Cursor changes to pointer for clickable elements
+
 ## ⚡ Instant Hover Tooltips
 
 ### Feature Description
-- **Instant custom tooltips** for foreign key and embedded entity fields
+- **Instant custom tooltips** for foreign key, embedded entity fields, and attribute tags
 - **0.1-second fade-in** replaces slow browser tooltips (500-1000ms delay)
 - **Professional design** with rounded corners, shadows, and proper alignment
 - **Smart positioning** with automatic boundary detection

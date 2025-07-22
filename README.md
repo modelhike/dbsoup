@@ -337,6 +337,7 @@ To get started with DBSoup, refer to the following documents based on your needs
 | 🔗 **[Relationships Example](docs/DBSOUP_RELATIONSHIPS_EXAMPLE.md)** | **Developers & AI** | Comprehensive examples of complex relationship modeling patterns including one-to-many, many-to-many, inheritance, and junction tables. |
 | 🎨 **[SVG Interactive Features](docs/10_SVG_INTERACTIVE_FEATURES.md)** | **Developers & AI** | Guide to interactive SVG features including **instant hover tooltips**, **module-based organization with descriptions**, clickable foreign key navigation, and enhanced visual styling. |
 | 🌈 **[SVG Color Reference](docs/09_SVG_COLOR_REFERENCE.md)** | **Developers & AI** | Complete color reference for SVG diagrams including field types, entity styles, and embedded entity highlighting. |
+| 🏷️ **[Attribute Tag System](docs/12_ATTRIBUTE_TAG_SYSTEM.md)** | **Developers & AI** | **NEW:** Comprehensive guide to the attribute tag system that displays field constraints as compact, color-coded tags with interactive features like hover tooltips and clickable navigation. |
 | 🔧 **[Formal Grammar](docs/DBSOUP_GRAMMAR.ebnf)** | **Tool Builders & AI** | The strict, formal EBNF grammar for the DBSoup language. Use this to build linters, validators, parsers, or any other automated tooling. |
 
 ## 4. Getting Started

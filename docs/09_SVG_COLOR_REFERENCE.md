@@ -45,6 +45,28 @@ This guide provides a complete reference for all color codes used in DBSoup SVG 
 | **Foreign Key** | Purple | `#e056fd` | Fields with `[FK:...]` constraint **[Clickable + Instant Tooltip]** |
 | **🆕 Embedded Entity Reference** | **Bright Yellow** | `#ffeb3b` | Standard entity fields referencing embedded entities **[Clickable + Instant Tooltip]** |
 
+## 🏷️ Attribute Tag Colors
+
+The DBSoup SVG generator displays field constraints as compact, color-coded attribute tags next to field names. Each constraint type has its own distinct color scheme:
+
+### Attribute Tag Color Palette
+| Tag Type | Background | Border | Text Color | Usage |
+|----------|------------|--------|------------|-------|
+| **Foreign Key** | `rgba(224, 86, 253, 0.15)` | `#e056fd` | `#e056fd` | `[FK:Entity.field]` constraints **[Clickable]** |
+| **Enum** | `rgba(41, 128, 185, 0.15)` | `#2980b9` | `#2980b9` | `[ENUM:values]` constraints **[Hover Tooltip]** |
+| **System** | `rgba(52, 73, 94, 0.15)` | `#34495e` | `#999999` | `[SYSTEM]`, `[AUTO]` constraints |
+| **Encrypted** | `rgba(255, 71, 87, 0.15)` | `#ff4757` | `#c0392b` | `[ENCRYPTED]` constraints |
+| **Default** | `rgba(211, 84, 0, 0.15)` | `#d35400` | `#d35400` | `[DEFAULT:value]` constraints |
+
+### Attribute Tag Features
+- **Compact Design**: Small, rounded tags (11px font, 12px height) that don't overwhelm field text
+- **Smart Sizing**: Dynamic width based on content with 6px padding
+- **Interactive Elements**: 
+  - FK tags are clickable for navigation
+  - Enum tags show hover tooltips with valid values
+  - System tags use special symbols (• for datetime fields)
+- **Visual Hierarchy**: Tags complement field colors without conflicting
+
 ### Embedded Entity Fields
 | Field Type | Color | Hex Code | Usage |
 |------------|-------|----------|-------|
@@ -168,10 +190,38 @@ Address
 - contact    : ContactInfo                    # Bright yellow, clickable → jumps to ContactInfo
 ```
 
+## 🎨 Color Legend Organization
+
+The generated SVG diagrams include a comprehensive color legend organized into two distinct sections:
+
+### Field Level Colors (Circle Swatches)
+Displays the color coding for field prefixes and field types:
+- **Required Fields** (Orange circle): Fields with `*` prefix
+- **Optional Fields** (Gray circle): Fields with `-` prefix  
+- **Indexed Fields** (Blue circle): Fields with `!` prefix
+- **Sensitive Fields** (Red circle): Fields with `@` prefix
+- **Foreign Key Fields** (Purple circle): Fields with `[FK:...]` constraint
+- **Embedded Entity References** (Yellow circle): Fields referencing embedded entities
+
+### Field Attribute Colors (Rectangle Swatches)
+Displays the color coding for attribute tags that appear next to fields:
+- **Foreign Key Attributes** (Purple rectangle): `[fk - EntityName]` tags
+- **Enum Attributes** (Blue rectangle): `[enum]` tags with hover tooltips
+- **System Attributes** (Dark gray rectangle): `[• now]`, `[auto]`, `[sys]` tags
+- **Encrypted Attributes** (Red rectangle): `[encrypted]` tags
+- **Default Value Attributes** (Orange rectangle): `[default]` tags
+
+### Legend Visual Design
+- **Professional Headers**: "Field Level Colors" and "Field Attribute Colors" in dark gray (#666666)
+- **Clear Differentiation**: Circles for field-level, rectangles for attribute-level
+- **Consistent Spacing**: Proper alignment and spacing between legend items
+- **Comprehensive Coverage**: All color codes used in the diagram are documented
+
 ## Implementation Notes
 - Colors are defined in SVG CSS classes for easy customization
 - **Field colors are now consistent** across standard and embedded entities for improved readability
 - **Entity box styling remains distinct** (embedded entities keep their purple-themed borders and headers for visual differentiation)
+- **Dual-purpose color legend** separates field-level and attribute-level color meanings for clarity
 
 ## Migration Summary (v2.0)
 The color consistency update ensures that field meanings are immediately clear regardless of entity type:
