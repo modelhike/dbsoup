@@ -18,7 +18,7 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 #### Foreign Key Tags (Purple) ✅
 - ✅ Display format: `[fk - EntityName]` (lowercase)
 - ✅ Always shows full entity name for clarity
-- ✅ Smaller font (10px) and minimal padding for compactness
+- ✅ Optimized font (11px) and minimal padding for compactness
 - ✅ Clickable navigation to referenced entity
 - ✅ Purple color scheme matching FK field colors
 
@@ -51,8 +51,8 @@ This document summarizes all the changes made to implement the DBSoup attribute 
 - ✅ Distinguishable from encrypted tags
 
 ### 3. **Visual Design** ✅
-- ✅ Font size: 11px (10px for FK tags)
-- ✅ Tag height: 12px (10px for FK tags)
+- ✅ Font size: 11px for all tag types (consistent sizing)
+- ✅ Tag height: 12px for all tag types (consistent sizing)
 - ✅ Border radius: 3px for modern appearance
 - ✅ Proper padding: 6px horizontal
 - ✅ Tag spacing: 3px gap between multiple tags

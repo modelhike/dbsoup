@@ -101,7 +101,7 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 
 ### Tag Dimensions and Spacing
 - **Font Size**: 11px for all tag types (consistent sizing)
-- **Tag Height**: 12px (10px for FK tags)
+- **Tag Height**: 12px for all tag types (consistent sizing)
 - **Padding**: 6px horizontal, minimal vertical
 - **Border Radius**: 3px for modern rounded corners
 - **Spacing**: 3px gap between multiple tags
@@ -110,7 +110,7 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
 ### Color Palette
 | Tag Type | Background | Border | Text Color |
 |----------|------------|---------|------------|
-| **Foreign Key** | `rgba(224, 86, 253, 0.08)` | `#e056fd` | `#7CB342` *(olive green - muted complementary color to purple)* |
+| **Foreign Key** | `#8e24aa` | `#8e24aa` | `#cccccc` *(muted gray text on dark purple for subtle professional appearance)* |
 | **Enum** | `rgba(41, 128, 185, 0.15)` | `#2980b9` | `#2980b9` |
 | **System** | `rgba(52, 73, 94, 0.15)` | `#34495e` | `#999999` |
 | **Encrypted** | `rgba(255, 71, 87, 0.15)` | `#ff4757` | `#c0392b` |
@@ -205,7 +205,7 @@ func getSmartDisplayText(constraint: String, value: String) -> (String, TagCateg
     /* Inherits from base with FK-specific adjustments */ 
 }
 .tag-fk-text { 
-    font-size: 10px; /* Smaller for FK tags */ 
+    font-size: 11px; /* Consistent with all tag types */ 
 }
 
 /* Hover effects */
