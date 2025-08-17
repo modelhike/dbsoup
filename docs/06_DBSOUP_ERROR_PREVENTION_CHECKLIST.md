@@ -273,9 +273,49 @@ User
 - [ ] All constraint syntax is valid
 - [ ] Primary keys marked with `[PK]`
 - [ ] Unique constraints marked with `[UK]`
-- [ ] Indexes marked with `[IX]`
+- [ ] Indexes marked with `[IX]`, compound indexes with `[CIX:(field1,field2)]`
+- [ ] Partial indexes marked with `[PIX:(condition)]`
 - [ ] Foreign keys marked with `[FK:Entity.field]`
-- [ ] System fields use `[SYSTEM]` annotation
+- [ ] System fields use `[SYSTEM]`, `[AUTO]`, or `[AUTO_INCREMENT]` annotation
+- [ ] Generated fields marked with `[GENERATED]`
+- [ ] Computed fields use `[COMPUTED:expression]` annotation
+- [ ] Enumerated values use `[ENUM:(value1,value2)]` format
+- [ ] Spatial fields marked with `[SPATIAL]`
+- [ ] Encrypted fields marked with `[ENCRYPTED]` or `[ENCRYPT:algorithm]`
+- [ ] PII fields marked with `[PII]`
+- [ ] Base64 data marked with `[BASE64]`
+- [ ] Currency fields marked with `[CURRENCY]`
+- [ ] Compressed data marked with `[COMPRESSED]`
+- [ ] Cached fields marked with `[CACHE]` or `[CACHED:strategy]`
+- [ ] TTL fields marked with `[TTL:duration]`
+- [ ] Sharded fields marked with `[SHARD:strategy]`
+- [ ] Partitioned fields marked with `[PARTITION:strategy]`
+- [ ] Validation rules use `[VALIDATE:rule]`
+- [ ] Check constraints use `[CHECK:condition]`
+- [ ] Deprecated fields marked with `[DEPRECATED]`
+- [ ] Collation rules use `[COLLATION:rule]`
+- [ ] Precision requirements use `[PRECISION:digits]`
+- [ ] Identity fields use `[IDENTITY:(seed,incr)]`
+- [ ] Virtual fields use `[VIRTUAL:expr]`
+- [ ] Stored computed fields use `[STORED:expr]`
+- [ ] Compression algorithms use `[COMPRESS:algorithm]`
+- [ ] Backup strategies use `[BACKUP:strategy]`
+- [ ] Monitoring thresholds use `[MONITOR:threshold]`
+- [ ] Character sets use `[CHARSET:encoding]`
+- [ ] Timezone specifications use `[TIMEZONE:zone]`
+- [ ] Row-level security uses `[RLS:policy]`
+- [ ] Alternative collation uses `[COLLATE:collation]`
+- [ ] MongoDB Atlas features use `[ATLAS:feature]`
+- [ ] MongoDB Realm settings use `[REALM:setting]`
+- [ ] Change streams use `[CHANGE:stream]`
+- [ ] Transaction settings use `[TRANSACTION:setting]`
+- [ ] Time series fields use `[TIMESERIES:field]`
+- [ ] Read preferences use `[READ:preference]`
+- [ ] Write concerns use `[WRITE:concern]`
+- [ ] Multikey indexes use `[MULTIKEY]`
+- [ ] Sparse indexes use `[SPARSE]`
+- [ ] Hashed indexes use `[HASHED]`
+- [ ] Text indexes use `[TEXT]`
 
 □ **Quality Assurance**
 - [ ] Run through [Comprehensive Quality Checklist](./05_COMPREHENSIVE_QUALITY_CHECKLIST.md)

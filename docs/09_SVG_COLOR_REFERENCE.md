@@ -54,7 +54,7 @@ The DBSoup SVG generator displays field constraints as compact, color-coded attr
 |----------|------------|--------|------------|-------|
 | **Foreign Key** | `#8e24aa` | `#8e24aa` | `#cccccc` | `[FK:Entity.field]` constraints **[Clickable]** - muted gray text on dark purple for subtle professional appearance |
 | **App/JSON** | `rgba(46, 204, 113, 0.8)` | `#27ae60` | `#ffffff` | `[app:field]`, `[json:field]` field mapping constraints - white text on solid green for maximum legibility |
-| **Enum** | `rgba(41, 128, 185, 0.15)` | `#2980b9` | `#2980b9` | `[ENUM:values]` constraints **[Hover Tooltip]** |
+| **Enum** | `rgba(41, 128, 185, 0.15)` | `#2980b9` | `#2980b9` | `[ENUM:(values)]` constraints **[Hover Tooltip]** |
 | **System** | `rgba(52, 73, 94, 0.15)` | `#34495e` | `#999999` | `[SYSTEM]`, `[AUTO]` constraints (except CURRENT_TIMESTAMP) |
 | **Encrypted** | `rgba(255, 71, 87, 0.15)` | `#ff4757` | `#c0392b` | `[ENCRYPTED]` constraints |
 | **Default** | `rgba(211, 84, 0, 0.15)` | `#d35400` | `#d35400` | `[DEFAULT:value]` constraints, including `• now` for CURRENT_TIMESTAMP |

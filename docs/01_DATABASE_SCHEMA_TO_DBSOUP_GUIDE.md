@@ -219,19 +219,90 @@ EntityName
 | **Standard Entity** | `EntityName` + `====` | Independent tables/collections | `User`, `Order`, `Product` |
 | **Embedded Entity** | `EntityName` + `/====/` | Nested/child entities, complex arrays | `Stop`, `OrderItem`, `Address` |
 
-### Constraint Annotations
+### Core Constraint Annotations
 | Annotation | Meaning | Example |
 |------------|---------|---------|
 | `[PK]` | Primary key | `* id : UUID [PK]` |
 | `[FK:Entity.field]` | Foreign key | `- user_id : UUID [FK:User.id]` |
 | `[UK]` | Unique key | `! email : String [UK]` |
 | `[IX]` | Basic index | `! name : String [IX]` |
+| `[CIX:(field1,field2)]` | Compound index | `! name,email : String [CIX:(name,email)]` |
+| `[PIX:(condition)]` | Partial index | `! active_users : String [PIX:(status='active')]` |
 | `[DEFAULT:value]` | Default value | `- status : String [DEFAULT:'active']` |
-| `[SYSTEM]` | System-generated | `- created_at : DateTime [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]` |
-| `[COMPUTED:expr]` | Computed field | `- full_name : String [COMPUTED:first+' '+last]` |
-| `[VALIDATE:rule]` | Validation rule | `* email : String [VALIDATE:required,email]` |
-| `[ENCRYPTED]` | Encryption | `@ password : String [ENCRYPTED]` |
+| `[ENUM:(values)]` | Enumerated values | `* status : String [ENUM:("active","inactive")]` |
+
+### System and Computed Field Constraints
+| Annotation | Meaning | Example |
+|------------|---------|---------|
+| `[SYSTEM]` | System-managed field | `- created_at : DateTime [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]` |
+| `[AUTO]` | Auto-generated (generic) | `- transaction_id : String [AUTO]` |
+| `[AUTO_INCREMENT]` | Auto-incrementing integer | `* id : Int [AUTO_INCREMENT]` |
+| `[GENERATED]` | Database trigger/function generated | `- full_name : String [GENERATED]` |
+| `[COMPUTED:expr]` | Computed from other fields | `- full_name : String [COMPUTED:first+' '+last]` |
+| `[DERIVED]` | Derived from external sources | `- external_ref : String [DERIVED]` |
+| `[IMMUTABLE]` | Cannot change after creation | `- created_id : String [IMMUTABLE]` |
+
+### Security and Privacy Constraints
+| Annotation | Meaning | Example |
+|------------|---------|---------|
+| `[ENCRYPTED]` | Field is encrypted | `@ password : String [ENCRYPTED]` |
+| `[ENCRYPT:algorithm]` | Encryption with algorithm | `@ secret : String [ENCRYPT:AES256]` |
+| `[PII]` | Personal identifiable info | `@ ssn : String [PII]` |
+| `[MASK:pattern]` | Data masking | `~ ssn : String [MASK:XXX-XX-####]` |
 | `[AUDIT]` | Audit trail | `$ changes : JSON [AUDIT:full]` |
+| `[RLS:policy]` | Row-level security | `$ secure_data : JSON [RLS:user_policy]` |
+
+### Performance and Data Constraints
+| Annotation | Meaning | Example |
+|------------|---------|---------|
+| `[SPATIAL]` | Spatial/geographic index | `* lat : Double [SPATIAL]` |
+| `[PARTITION:strategy]` | Partitioning key | `> tenant_id : String [PARTITION:hash]` |
+| `[SHARD:strategy]` | Sharding key | `> user_id : String [SHARD:range]` |
+| `[CACHE]` | Enable caching | `% data : JSON [CACHE]` |
+| `[CACHED:strategy]` | Caching strategy | `% data : JSON [CACHED:redis]` |
+| `[TTL:duration]` | Time-to-live | `% temp_data : JSON [TTL:3600]` |
+| `[REPLICATE:strategy]` | Replication strategy | `& data : String [REPLICATE:master-slave]` |
+| `[FEDERATED]` | Federated/distributed system | `& distributed_data : String [FEDERATED]` |
+| `[BASE64]` | Base64 encoded data | `- image : String [BASE64]` |
+| `[CURRENCY]` | Monetary value | `* price : Decimal [CURRENCY]` |
+| `[COMPRESSED]` | Compressed data | `- content : String [COMPRESSED]` |
+| `[COLLATION:rule]` | Text collation | `@ text : String [COLLATION:utf8_general_ci]` |
+| `[COLLATE:collation]` | Collation (alternative) | `@ name : String [COLLATE:utf8_unicode_ci]` |
+| `[CHARSET:encoding]` | Character set | `@ text : String [CHARSET:utf8mb4]` |
+| `[TIMEZONE:zone]` | Timezone specification | `@ timestamp : DateTime [TIMEZONE:UTC]` |
+| `[PRECISION:digits]` | Numeric precision | `* amount : Decimal [PRECISION:2]` |
+
+### Validation and Business Rules
+| Annotation | Meaning | Example |
+|------------|---------|---------|
+| `[VALIDATE:rule]` | Validation rule | `* email : String [VALIDATE:required,email]` |
+| `[CHECK:condition]` | Check constraint | `- age : Int [CHECK:age >= 18]` |
+| `[DEPRECATED]` | Deprecated field | `- old_field : String [DEPRECATED]` |
+
+### Database-Specific Constraints
+| Annotation | Meaning | Example |
+|------------|---------|---------|
+| `[IDENTITY:(seed,incr)]` | Identity with seed/increment | `* id : Int [IDENTITY:(1,1)]` |
+| `[VIRTUAL:expr]` | Virtual computed field | `- age : Int [VIRTUAL:YEAR(NOW())-birth_year]` |
+| `[STORED:expr]` | Stored computed field | `- total : Decimal [STORED:price*quantity]` |
+| `[COMPRESS:algorithm]` | Compression with algorithm | `- content : Text [COMPRESS:gzip]` |
+| `[BACKUP:strategy]` | Backup strategy | `* critical : String [BACKUP:realtime]` |
+| `[MONITOR:threshold]` | Monitoring threshold | `@ performance : Float [MONITOR:>1000ms]` |
+
+### MongoDB-Specific Constraints
+| Annotation | Meaning | Example |
+|------------|---------|---------|
+| `[ATLAS:feature]` | MongoDB Atlas feature | `@ content : String [ATLAS:search-index]` |
+| `[REALM:setting]` | MongoDB Realm setting | `* user_id : String [REALM:partition-key]` |
+| `[CHANGE:stream]` | Change stream config | `@ updates : JSON [CHANGE:fullDocument]` |
+| `[TRANSACTION:setting]` | Transaction setting | `* amount : Decimal [TRANSACTION:majority]` |
+| `[TIMESERIES:field]` | Time series designation | `* timestamp : DateTime [TIMESERIES:timeField]` |
+| `[READ:preference]` | Read preference | `& cached_data : String [READ:secondary]` |
+| `[WRITE:concern]` | Write concern | `* critical : String [WRITE:majority]` |
+| `[MULTIKEY]` | Multikey index | `! tags : Array<String> [MULTIKEY]` |
+| `[SPARSE]` | Sparse index | `! optional_field : String [SPARSE]` |
+| `[HASHED]` | Hashed index | `! shard_key : String [HASHED]` |
+| `[TEXT]` | Text index | `! content : String [TEXT]` |
 
 **For complete constraint reference, see [Database Types and Mappings](./02_DATABASE_TYPES_AND_MAPPINGS.md)**
 

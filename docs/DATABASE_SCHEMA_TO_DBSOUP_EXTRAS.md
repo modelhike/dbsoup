@@ -243,7 +243,7 @@ HighPerformanceEntity
 ! created_date    : DateTime                 [IX:1,PARTITION:monthly]
 ! status          : Enum(active,inactive,archived) [IX:1]
 ! priority        : Int                      [IX:1,CK:priority BETWEEN 1 AND 5]
-! category_id     : ID                       [FK:Category._id,CIX:tenant_id,category_id,created_date]
+! category_id     : ID                       [FK:Category._id,CIX:(tenant_id,category_id,created_date)]
 % search_index    : Text                     [CACHED:elasticsearch]
 ^ computed_score  : Float                    [COMPUTED:priority * 0.3 + category_weight * 0.7]
 < large_content   : Text                     [COMPRESS:lz4]
@@ -276,7 +276,7 @@ TimeSeriesMetadata
 * floor           : Int                      
 * sensor_type     : String                   
 * calibration_date : DateTime                
-@ timestamp,device_id : DateTime,String      [CIX:covering]
+@ timestamp,device_id : DateTime,String      [CIX:(covering)]
 < historical_data : Buffer                   [COMPRESS:zstd,ARCHIVE:cold-storage]
 % aggregated_hourly : HourlyAggregation      [CACHED:aggregation]
 
@@ -304,9 +304,9 @@ SearchOptimizedEntity
 ! location : Geography [IX:gist]
 ! price_range : NumRange [IX:gist]
 ! metadata : JSONB [FIX:gin(metadata)]
-! status,priority : Enum,Int [CIX:covering(id,title,created_date)]
-! customer_id,order_date : ID,DateTime [CIX:customer_orders]
-! active_status : Boolean [PIX:WHERE active_status = true]
+! status,priority : Enum,Int [CIX:(covering,id,title,created_date)]
+! customer_id,order_date : ID,DateTime [CIX:(customer_orders)]
+! active_status : Boolean [PIX:(WHERE active_status = true)]
 
 # Specialized Indexes
 ! search_vector : TSVector [FIX:gin] [COMPUTED:to_tsvector('english', title || ' ' || content)]
@@ -347,7 +347,7 @@ VirusScanResult
 /=======/
 * _id : ObjectId [PK]
 * file_metadata_id : ObjectId [FK:FileMetadata._id]
-* status : String [VALIDATE:enum:['pending','clean','infected','error']]
+* status : String [VALIDATE:enum:('pending','clean','infected','error')]
 * scanned_at : DateTime
 * scanner_version : String
 * scan_result : String
@@ -377,7 +377,7 @@ ProcessingStatus
 /=======/
 * _id : ObjectId [PK]
 * file_metadata_id : ObjectId [FK:FileMetadata._id]
-* status : String [VALIDATE:enum:['pending','processing','completed','failed']]
+* status : String [VALIDATE:enum:('pending','processing','completed','failed')]
 - thumbnails : ProcessingThumbnail[0..*]
 - transcodes : ProcessingTranscode[0..*]
 
@@ -419,7 +419,7 @@ GridFS_Chunks
 * files_id       : ObjectId                  [FK:GridFS_Files._id,IX:1]
 * n              : Int                       [IX:1]
 * data           : BinData                   
-@ files_id,n     : ObjectId,Int              [CIX:unique]
+@ files_id,n     : ObjectId,Int              [CIX:(unique)]
 ```
 
 #### Cloud File Storage Pattern

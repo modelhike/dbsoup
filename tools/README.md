@@ -275,7 +275,7 @@ Account # Account entity for organizations
 * id              : String                 [PK]
 * name            : String(100)            [UK]
 * email           : String                 [UK,INDEX]
-* accountType     : Int                    [ENUM:1,2,3,4,5]
+* accountType     : Int                    [ENUM:(1,2,3,4,5)]
 * isActive        : Boolean                [DEFAULT:true]
 * createdAt       : DateTime               [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]
 
@@ -287,7 +287,7 @@ Post # Blog post entity
 * title           : String(200)            [INDEX]
 * content         : Text                   
 * authorId        : String                 [FK:User.id]
-* status          : Int                    [ENUM:1,2,3,DEFAULT:1]
+* status          : Int                    [ENUM:(1,2,3),DEFAULT:1]
 * publishedAt     : DateTime               
 * createdAt       : DateTime               [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]
 * updatedAt       : DateTime               [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]
@@ -379,7 +379,7 @@ let formattedOutput = formatter.format(document: document)
 // * createdAt         : DateTime                   [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]
 // * id                : String                     [PK]
 // * publishedAt       : DateTime                   
-// * status            : Int                        [ENUM:1,2,3,DEFAULT:1]
+// * status            : Int                        [ENUM:(1,2,3),DEFAULT:1]
 // - tags              : Tag[0..*]                  # Optional tags
 // * title             : String(200)                [INDEX]
 // * updatedAt         : DateTime                   [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]

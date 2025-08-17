@@ -576,7 +576,14 @@ public class DBSoupSVGGenerator {
         let nameText = field.names.joined(separator: ", ")
         let typeText = formatDataType(field.dataType)
         
-        return "\(prefixText) \(nameText): \(typeText)"
+        // Ensure clean field text without any constraint information
+        let cleanText = "\(prefixText) \(nameText): \(typeText)"
+        
+        // Remove any accidentally included constraint patterns
+        let pattern = #"\s*\{[^}]*\}\$?\]?$"#
+        let cleanedText = cleanText.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+        
+        return cleanedText
     }
     
     private func generateConstraintTags(field: Field, x: Int, y: Int, fieldText: String) -> String {
@@ -775,7 +782,7 @@ public class DBSoupSVGGenerator {
         for header in layout.moduleHeaders {
             let hasDescription = header.description != nil && !header.description!.isEmpty
             let barHeight = hasDescription ? 40 : 32
-            let moduleId = "module-\(header.name.lowercased())"
+            let moduleId = "module-\(xmlEscape(header.name.lowercased()))"
             
             svg += """
             <g class="module-header" id="\(moduleId)">
@@ -1072,11 +1079,21 @@ public class DBSoupSVGGenerator {
         let headerHeight = 45
         let lineHeight = 18
         var totalLines = 2 // Title and padding
-        let maxCharsPerLine = 70 // Same as used in text wrapping
+        let maxCharsForOverview = 50 // Optimized to fit within 400px overview box width
         
-        if overview.purpose != nil { totalLines += 1 }
-        if overview.domain != nil { totalLines += 1 }
-        if overview.architecturePattern != nil { totalLines += 1 }
+        // Account for wrapped text in purpose, domain, and pattern
+        if let purpose = overview.purpose {
+            let wrappedLines = wrapText(purpose, maxCharsPerLine: maxCharsForOverview)
+            totalLines += wrappedLines.count
+        }
+        if let domain = overview.domain {
+            let wrappedLines = wrapText(domain, maxCharsPerLine: maxCharsForOverview)
+            totalLines += wrappedLines.count
+        }
+        if let pattern = overview.architecturePattern {
+            let wrappedLines = wrapText(pattern, maxCharsPerLine: maxCharsForOverview)
+            totalLines += wrappedLines.count
+        }
         
         // Account for module tag cloud (after pattern)
         let moduleList = getModuleList()
@@ -1094,7 +1111,7 @@ public class DBSoupSVGGenerator {
         if !overview.dataDistribution.isEmpty {
             totalLines += 1 // Section header
             for distribution in overview.dataDistribution.prefix(3) {
-                let wrappedLines = wrapText(distribution, maxCharsPerLine: maxCharsPerLine)
+                let wrappedLines = wrapText(distribution, maxCharsPerLine: 70) // Use 70 for detail sections as they have more space
                 totalLines += wrappedLines.count
             }
         }
@@ -1102,7 +1119,7 @@ public class DBSoupSVGGenerator {
         if !overview.keyFeatures.isEmpty {
             totalLines += 1 // Section header
             for feature in overview.keyFeatures.prefix(3) {
-                let wrappedLines = wrapText(feature, maxCharsPerLine: maxCharsPerLine)
+                let wrappedLines = wrapText(feature, maxCharsPerLine: 70) // Use 70 for detail sections as they have more space
                 totalLines += wrappedLines.count
             }
         }
@@ -1110,7 +1127,7 @@ public class DBSoupSVGGenerator {
         if !overview.moduleBreakdown.isEmpty {
             totalLines += 1 // Section header
             for module in overview.moduleBreakdown.prefix(4) {
-                let wrappedLines = wrapText(module, maxCharsPerLine: maxCharsPerLine)
+                let wrappedLines = wrapText(module, maxCharsPerLine: 70) // Use 70 for detail sections as they have more space
                 totalLines += wrappedLines.count
             }
         }
@@ -1331,6 +1348,7 @@ public class DBSoupSVGGenerator {
         let y = layout.overviewY
         let width = layout.overviewWidth
         let lineHeight = 18
+        let maxCharsForOverview = 50 // Optimized to fit within 400px overview box width
         var currentY = y + 25
         
         var svg = """
@@ -1346,28 +1364,49 @@ public class DBSoupSVGGenerator {
         if let purpose = overview.purpose {
             svg += """
             <text x="\(x + 15)" y="\(currentY)" class="overview-label">Purpose:</text>
-            <text x="\(x + 85)" y="\(currentY)" class="overview-text">\(xmlEscape(purpose))</text>
             
             """
-            currentY += lineHeight
+            // Wrap purpose text to fit within the overview box
+            let wrappedPurpose = wrapText(purpose, maxCharsPerLine: maxCharsForOverview)
+            for (lineIndex, line) in wrappedPurpose.enumerated() {
+                svg += """
+                <text x="\(x + 85)" y="\(currentY + lineIndex * lineHeight)" class="overview-text">\(xmlEscape(line))</text>
+                
+                """
+            }
+            currentY += lineHeight * wrappedPurpose.count
         }
         
         if let domain = overview.domain {
             svg += """
             <text x="\(x + 15)" y="\(currentY)" class="overview-label">Domain:</text>
-            <text x="\(x + 85)" y="\(currentY)" class="overview-text">\(xmlEscape(domain))</text>
             
             """
-            currentY += lineHeight
+            // Wrap domain text to fit within the overview box
+            let wrappedDomain = wrapText(domain, maxCharsPerLine: maxCharsForOverview)
+            for (lineIndex, line) in wrappedDomain.enumerated() {
+                svg += """
+                <text x="\(x + 85)" y="\(currentY + lineIndex * lineHeight)" class="overview-text">\(xmlEscape(line))</text>
+                
+                """
+            }
+            currentY += lineHeight * wrappedDomain.count
         }
         
         if let pattern = overview.architecturePattern {
             svg += """
             <text x="\(x + 15)" y="\(currentY)" class="overview-label">Pattern:</text>
-            <text x="\(x + 85)" y="\(currentY)" class="overview-text">\(xmlEscape(pattern))</text>
             
             """
-            currentY += lineHeight + 8
+            // Wrap pattern text to fit within the overview box
+            let wrappedPattern = wrapText(pattern, maxCharsPerLine: maxCharsForOverview)
+            for (lineIndex, line) in wrappedPattern.enumerated() {
+                svg += """
+                <text x="\(x + 85)" y="\(currentY + lineIndex * lineHeight)" class="overview-text">\(xmlEscape(line))</text>
+                
+                """
+            }
+            currentY += lineHeight * wrappedPattern.count + 8
         } else {
             currentY += 5
         }
@@ -1385,7 +1424,7 @@ public class DBSoupSVGGenerator {
             let maxRowWidth = x + width - 20 // Leave minimal padding, use almost full width
             
             for moduleInfo in moduleList {
-                let moduleId = "module-\(moduleInfo.name.lowercased())"
+                let moduleId = "module-\(xmlEscape(moduleInfo.name.lowercased()))"
                 let tagText = moduleInfo.name
                 let estimatedWidth = tagText.count * 6 + 12 // More accurate estimate: 6px per char + 12px padding
                 
@@ -1399,7 +1438,7 @@ public class DBSoupSVGGenerator {
                 <rect x="\(currentX - 4)" y="\(currentY - 12)" width="\(estimatedWidth)" height="16" 
                       fill="#e8f4f8" stroke="#3498db" stroke-width="1" rx="8" opacity="0.7"/>
                 <text x="\(currentX)" y="\(currentY)" class="module-tag" 
-                      onclick="document.getElementById('\(moduleId)').scrollIntoView({behavior:'smooth'}); var moduleGroup = document.getElementById('\(moduleId)'); if(moduleGroup) { var moduleTitle = moduleGroup.getElementsByClassName('module-title')[0]; var rects = moduleGroup.getElementsByTagName('rect'); if(moduleTitle) { moduleTitle.style.fill='#e74c3c'; moduleTitle.style.fontWeight='900'; } for(var i=0; i&lt;rects.length; i++) { rects[i].style.fill='#e74c3c'; rects[i].style.stroke='#c0392b'; rects[i].style.strokeWidth='2'; } setTimeout(() => { if(moduleTitle) { moduleTitle.style.fill=''; moduleTitle.style.fontWeight=''; } for(var i=0; i&lt;rects.length; i++) { rects[i].style.fill=''; rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500); }" 
+                      onclick="document.getElementById('\(moduleId)').scrollIntoView({behavior:'smooth'}); var moduleGroup = document.getElementById('\(moduleId)'); if(moduleGroup) { var moduleTitle = moduleGroup.getElementsByClassName('module-title')[0]; var rects = moduleGroup.getElementsByTagName('rect'); if(moduleTitle) { moduleTitle.style.fill='#e74c3c'; moduleTitle.style.fontWeight='900'; } for(var i=0; i&amp;lt;rects.length; i++) { rects[i].style.fill='#e74c3c'; rects[i].style.stroke='#c0392b'; rects[i].style.strokeWidth='2'; } setTimeout(() => { if(moduleTitle) { moduleTitle.style.fill=''; moduleTitle.style.fontWeight=''; } for(var i=0; i&amp;lt;rects.length; i++) { rects[i].style.fill=''; rects[i].style.stroke=''; rects[i].style.strokeWidth=''; } }, 1500); }" 
                       style="cursor: pointer; fill: #2980b9; font-size: 11px;">\(xmlEscape(tagText))</text>
                 """
                 

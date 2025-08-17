@@ -3,8 +3,13 @@
   This grammar describes the syntax for documenting database schemas
   in a standardized, human-readable, and machine-parsable format.
 
-  Version: 1.0
+  Version: 1.1
   Author: Gemini
+  
+  Constraint Examples:
+  - Simple: [PK], [UK], [INDEX]
+  - With value: [DEFAULT:value], [FK:Entity.field]
+  - Multi-value: [IDENTITY:(1,1)], [ENUM:("active","inactive")], [CIX:(field1,field2)]
 *)
 
 dbsoup_document ::= yaml_header?, header?, relationships_definition?, schema_definition, { comment };
@@ -74,8 +79,13 @@ cardinality ::= number, "..", ( number | "*" );
 json_object_type ::= "JSON", [ "{", NEWLINE, { json_field }, "}" ];
 json_field ::= identifier, ":", data_type, [","], NEWLINE;
 
+(* Constraint syntax supports both simple values and parenthesized multi-values *)
 constraints ::= { "[", constraint_content, { ",", constraint_content }, "]" };
-constraint_content ::= identifier, [ ":", text_until_bracket_or_comma ];
+constraint_content ::= identifier, [ ":", constraint_value ];
+constraint_value ::= parenthesized_values | simple_value;
+parenthesized_values ::= "(", constraint_param, { ",", constraint_param }, ")";
+constraint_param ::= string | number | identifier;
+simple_value ::= text_until_bracket_or_comma;
 
 relationship_section ::= "# RELATIONSHIPS", NEWLINE, { relationship_line | relationship_detail | comment | blank_line };
 relationship_line ::= "@ relationships::", text_until_newline, [ inline_comment ], NEWLINE;

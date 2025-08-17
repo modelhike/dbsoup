@@ -18,6 +18,7 @@ class DBSoupTest {
             testRelationshipParsing()
             testFieldParsing()
             testDataTypeParsing()
+            testConstraintValidation()
             testValidation()
             testFormatting()
             testStatistics()
@@ -218,6 +219,191 @@ class DBSoupTest {
             } else {
                 throw TestError("Expected relationship array data type")
             }
+        }
+    }
+    
+    private func testConstraintValidation() {
+        printTestHeader("Constraint Validation")
+        
+        let constraintDBSoup = """
+        @test.dbsoup
+        
+        === DATABASE SCHEMA ===
+        + Core
+        
+        === Core ===
+        
+        User # User entity with comprehensive constraints
+        ==========
+        * _id              : String                   [PK]
+        * username         : String(50)               [UK,INDEX]
+        @ password         : String                   [ENCRYPTED]
+        @ ssn              : String(11)               [PII,MASK:XXX-XX-####]
+        * lat              : Double                   [SPATIAL]
+        * lng              : Double                   [SPATIAL]
+        - profile_image    : String                   [BASE64]
+        * salary           : Decimal(10,2)            [CURRENCY]
+        * status           : String                   [ENUM:"active","inactive","pending"]
+        * user_type        : Int                      [ENUM:1,2,3,4,5]
+        > tenant_id        : String                   [PARTITION:hash]
+        > shard_key        : String                   [SHARD:range]
+        ! email            : String                   [CIX:email,tenant_id]
+        ! search_name      : String                   [PIX:length(search_name)>0]
+        % cached_data      : JSON                     [CACHED:redis,TTL:3600]
+        $ audit_log        : JSON                     [AUDIT:full]
+        - old_field        : String                   [DEPRECATED]
+        - validation_field : String                   [VALIDATE:length>5]
+        - check_field      : Int                      [CHECK:value>0]
+        - collated_field   : String                   [COLLATION:utf8_general_ci]
+        - precision_field  : Decimal(15,4)            [PRECISION:4]
+        - generated_field  : String                   [GENERATED:CONCAT(first_name,' ',last_name)]
+        - computed_field   : String                   [COMPUTED:first_name+' '+last_name]
+        - auto_field       : Int                      [AUTO_INCREMENT]
+        - system_field     : DateTime                 [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]
+        - compressed_data  : String                   [COMPRESSED:gzip]
+        - default_field    : String                   [DEFAULT:"default_value"]
+        - foreign_key      : String                   [FK:Account.id]
+        """
+        
+        test("Parse and validate all constraint types") {
+            let parser = DBSoupParser(content: constraintDBSoup)
+            let document = try parser.parse()
+            
+            let validator = DBSoupValidator(document: document)
+            let result = validator.validate()
+            
+            // Should be valid with no errors (only warnings allowed)
+            assert(result.isValid, "Document should be valid")
+            assert(result.errors.count == 0, "Should have no validation errors")
+            
+            let entity = document.schemaDefinition.moduleSections.first!.entities.first!
+            assert(entity.name == "User", "Entity name should be 'User'")
+            assert(entity.fields.count == 25, "Should have 25 fields with various constraints")
+        }
+        
+        test("Validate SPATIAL constraints are recognized") {
+            let spatialDBSoup = """
+            @test.dbsoup
+            
+            === DATABASE SCHEMA ===
+            + Geo
+            
+            === Geo ===
+            
+            Location
+            ==========
+            * _id       : String    [PK]
+            * latitude  : Double    [SPATIAL]
+            * longitude : Double    [SPATIAL]
+            """
+            
+            let parser = DBSoupParser(content: spatialDBSoup)
+            let document = try parser.parse()
+            
+            let validator = DBSoupValidator(document: document)
+            let result = validator.validate()
+            
+            // Should not have warnings about unknown SPATIAL constraint
+            let hasSpatialWarning = result.warnings.contains { warning in
+                warning.contains("SPATIAL") && warning.contains("Unknown constraint")
+            }
+            assert(!hasSpatialWarning, "Should not have warnings about SPATIAL constraint")
+        }
+        
+        test("Validate BASE64 and CURRENCY constraints are recognized") {
+            let encodingDBSoup = """
+            @test.dbsoup
+            
+            === DATABASE SCHEMA ===
+            + Data
+            
+            === Data ===
+            
+            Document
+            ==========
+            * _id       : String      [PK]
+            - image     : String      [BASE64]
+            - price     : Decimal     [CURRENCY]
+            """
+            
+            let parser = DBSoupParser(content: encodingDBSoup)
+            let document = try parser.parse()
+            
+            let validator = DBSoupValidator(document: document)
+            let result = validator.validate()
+            
+            // Should not have warnings about BASE64 or CURRENCY constraints
+            let hasEncodingWarnings = result.warnings.contains { warning in
+                (warning.contains("BASE64") || warning.contains("CURRENCY")) && warning.contains("Unknown constraint")
+            }
+            assert(!hasEncodingWarnings, "Should not have warnings about BASE64 or CURRENCY constraints")
+        }
+        
+        test("Validate ENUM constraints with comma-separated values") {
+            let enumDBSoup = """
+            @test.dbsoup
+            
+            === DATABASE SCHEMA ===
+            + Test
+            
+            === Test ===
+            
+            Status
+            ==========
+            * _id           : String    [PK]
+            * string_status : String    [ENUM:"active","inactive","pending"]
+            * int_status    : Int       [ENUM:1,2,3,4,5]
+            """
+            
+            let parser = DBSoupParser(content: enumDBSoup)
+            let document = try parser.parse()
+            
+            let validator = DBSoupValidator(document: document)
+            let result = validator.validate()
+            
+            // Should be valid and not treat individual enum values as separate constraints
+            assert(result.isValid, "Document should be valid")
+            
+            let entity = document.schemaDefinition.moduleSections.first!.entities.first!
+            let stringStatusField = entity.fields.first { $0.names.contains("string_status") }!
+            let enumConstraint = stringStatusField.constraints.first { $0.name == "ENUM" }
+            
+            assert(enumConstraint != nil, "Should have ENUM constraint")
+            assert(enumConstraint!.value == "\"active\",\"inactive\",\"pending\"", "ENUM should have comma-separated values")
+        }
+        
+        test("Validate cardinality constraints are not treated as unknown constraints") {
+            let cardinalityDBSoup = """
+            @test.dbsoup
+            
+            === DATABASE SCHEMA ===
+            + Test
+            
+            === Test ===
+            
+            Order
+            ==========
+            * _id     : String           [PK]
+            - items   : OrderItem[0..*]  # Array with cardinality
+            - tags    : Tag[1..*]        # Array with minimum cardinality
+            
+            OrderItem
+            /=======/
+            * _id     : String           [PK]
+            * name    : String
+            """
+            
+            let parser = DBSoupParser(content: cardinalityDBSoup)
+            let document = try parser.parse()
+            
+            let validator = DBSoupValidator(document: document)
+            let result = validator.validate()
+            
+            // Should not have warnings about cardinality patterns like "0..*"
+            let hasCardinalityWarnings = result.warnings.contains { warning in
+                warning.contains("0..*") && warning.contains("Unknown constraint")
+            }
+            assert(!hasCardinalityWarnings, "Should not have warnings about cardinality constraints")
         }
     }
     

@@ -841,14 +841,9 @@ public class DBSoupParser {
             let constraintRange = Range(match.range(at: 1), in: workingInput)!
             let constraintString = String(workingInput[constraintRange])
             
-            // Parse individual constraints
-            let individualConstraints = constraintString.components(separatedBy: ",")
-            for constraintStr in individualConstraints {
-                let constraintParts = constraintStr.components(separatedBy: ":")
-                let name = constraintParts[0].trimmingCharacters(in: .whitespaces)
-                let value = constraintParts.count > 1 ? constraintParts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces) : nil
-                constraints.append(Constraint(name: name, value: value))
-            }
+            // Parse individual constraints with special handling for ENUM
+            let parsedConstraints = parseConstraintsFromString(constraintString)
+            constraints.append(contentsOf: parsedConstraints)
             
             // Remove constraint from working input
             let fullRange = Range(match.range(at: 0), in: workingInput)!
@@ -860,6 +855,200 @@ public class DBSoupParser {
         let dataType = try parseDataType(dataTypeString)
         
         return (dataType, constraints, comment)
+    }
+    
+    private func parseConstraintsFromString(_ constraintString: String) -> [Constraint] {
+        var constraints: [Constraint] = []
+        var remaining = constraintString
+        
+        while !remaining.isEmpty {
+            remaining = remaining.trimmingCharacters(in: .whitespaces)
+            if remaining.isEmpty { break }
+            
+            // Check if this starts with ENUM:
+            if remaining.starts(with: "ENUM:") {
+                // Find the end of the ENUM constraint by looking for the next constraint
+                // ENUM values can contain quotes, numbers, and commas
+                let enumStart = remaining.index(remaining.startIndex, offsetBy: 5) // Skip "ENUM:"
+                var enumEnd = remaining.endIndex
+                var depth = 0
+                var inQuotes = false
+                var escapeNext = false
+                
+                for (index, char) in remaining[enumStart...].enumerated() {
+                    let currentIndex = remaining.index(enumStart, offsetBy: index)
+                    
+                    if escapeNext {
+                        escapeNext = false
+                        continue
+                    }
+                    
+                    if char == "\\" {
+                        escapeNext = true
+                        continue
+                    }
+                    
+                    if char == "\"" {
+                        inQuotes = !inQuotes
+                        continue
+                    }
+                    
+                    if !inQuotes {
+                        if char == "(" || char == "[" {
+                            depth += 1
+                        } else if char == ")" || char == "]" {
+                            depth -= 1
+                        } else if char == "," && depth == 0 {
+                            // Check if this comma starts a new constraint (look ahead for constraint pattern)
+                            let afterComma = remaining.index(after: currentIndex)
+                            if afterComma < remaining.endIndex {
+                                let afterCommaStr = String(remaining[afterComma...]).trimmingCharacters(in: .whitespaces)
+                                // Check if it looks like a constraint (contains : or is a known constraint name)
+                                if afterCommaStr.contains(":") || 
+                                   afterCommaStr.starts(with: "PK") || afterCommaStr.starts(with: "FK") || 
+                                   afterCommaStr.starts(with: "UK") || afterCommaStr.starts(with: "INDEX") ||
+                                   afterCommaStr.starts(with: "DEFAULT") || afterCommaStr.starts(with: "SYSTEM") ||
+                                   afterCommaStr.starts(with: "AUTO") || afterCommaStr.starts(with: "ENCRYPTED") {
+                                    enumEnd = currentIndex
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                let enumValue = String(remaining[enumStart..<enumEnd]).trimmingCharacters(in: .whitespaces)
+                constraints.append(Constraint(name: "ENUM", value: enumValue))
+                
+                // Move past the ENUM constraint
+                if enumEnd < remaining.endIndex {
+                    remaining = String(remaining[remaining.index(after: enumEnd)...])
+                } else {
+                    remaining = ""
+                }
+            } else {
+                // Check for constraints with parenthesized values: CONSTRAINT:(value1,value2,...) or CONSTRAINT:key:(value1,value2,...)
+                // But make sure it's not a mixed constraint like UK,CIX:(...)
+                if remaining.contains(":(") {
+                    // Find the position of ":(" pattern
+                    if let parenColonRange = remaining.range(of: ":(") {
+                        // Check if there's a comma before the ":(" - if so, this is a mixed constraint
+                        let beforeParen = String(remaining[..<parenColonRange.lowerBound])
+                        if beforeParen.contains(",") {
+                            // This is a mixed constraint, handle it normally
+                        } else {
+                        // Find matching closing parenthesis starting from the opening parenthesis
+                        let parenStart = parenColonRange.upperBound
+                        var parenDepth = 0
+                        var constraintEnd = remaining.endIndex
+                        var inQuotes = false
+                        var escapeNext = false
+                        
+                        for (offset, char) in remaining[parenStart...].enumerated() {
+                            let currentIndex = remaining.index(parenStart, offsetBy: offset)
+                            
+                            if escapeNext {
+                                escapeNext = false
+                                continue
+                            }
+                            
+                            if char == "\\" {
+                                escapeNext = true
+                                continue
+                            }
+                            
+                            if char == "\"" {
+                                inQuotes = !inQuotes
+                                continue
+                            }
+                            
+                            if !inQuotes {
+                                if char == "(" {
+                                    parenDepth += 1
+                                } else if char == ")" {
+                                    parenDepth -= 1
+                                    if parenDepth == 0 {
+                                        constraintEnd = remaining.index(after: currentIndex)
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                        
+                        let constraintStr = String(remaining[..<constraintEnd]).trimmingCharacters(in: .whitespaces)
+                        let constraintParts = constraintStr.components(separatedBy: ":")
+                        let name = constraintParts[0].trimmingCharacters(in: .whitespaces)
+                        let value = constraintParts.count > 1 ? constraintParts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces) : nil
+                        constraints.append(Constraint(name: name, value: value))
+                        
+                        // Move past this constraint
+                        if constraintEnd < remaining.endIndex {
+                            remaining = String(remaining[constraintEnd...]).trimmingCharacters(in: .whitespaces)
+                            if remaining.starts(with: ",") {
+                                remaining = String(remaining.dropFirst()).trimmingCharacters(in: .whitespaces)
+                            }
+                        } else {
+                            remaining = ""
+                        }
+                        continue
+                        }
+                    }
+                }
+                
+                // Parse normal constraint - find comma that's not inside parentheses
+                var commaRange: Range<String.Index>? = nil
+                var parenDepth = 0
+                var inQuotes = false
+                var escapeNext = false
+                
+                for (offset, char) in remaining.enumerated() {
+                    let currentIndex = remaining.index(remaining.startIndex, offsetBy: offset)
+                    
+                    if escapeNext {
+                        escapeNext = false
+                        continue
+                    }
+                    
+                    if char == "\\" {
+                        escapeNext = true
+                        continue
+                    }
+                    
+                    if char == "\"" {
+                        inQuotes = !inQuotes
+                        continue
+                    }
+                    
+                    if !inQuotes {
+                        if char == "(" {
+                            parenDepth += 1
+                        } else if char == ")" {
+                            parenDepth -= 1
+                        } else if char == "," && parenDepth == 0 {
+                            commaRange = currentIndex..<remaining.index(after: currentIndex)
+                            break
+                        }
+                    }
+                }
+                
+                let constraintEnd = commaRange?.lowerBound ?? remaining.endIndex
+                let constraintStr = String(remaining[..<constraintEnd]).trimmingCharacters(in: .whitespaces)
+                
+                let constraintParts = constraintStr.components(separatedBy: ":")
+                let name = constraintParts[0].trimmingCharacters(in: .whitespaces)
+                let value = constraintParts.count > 1 ? constraintParts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces) : nil
+                constraints.append(Constraint(name: name, value: value))
+                
+                // Move past this constraint
+                if let commaRange = commaRange {
+                    remaining = String(remaining[remaining.index(after: commaRange.lowerBound)...])
+                } else {
+                    remaining = ""
+                }
+            }
+        }
+        
+        return constraints
     }
     
     private func parseDataType(_ input: String) throws -> DataType {

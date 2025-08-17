@@ -53,7 +53,7 @@ The DBSoup SVG generator now includes a sophisticated attribute tag system that 
   - Interactive tooltip with professional styling
 
 ```dbsoup
-- status : String [ENUM:active,inactive,pending]  # Displays: [enum] + hover tooltip
+- status : String [ENUM:(active,inactive,pending)]  # Displays: [enum] + hover tooltip
 ```
 
 #### 4. **System Attribute Tags** (Dark Gray)
@@ -279,7 +279,7 @@ func getSmartDisplayText(constraint: String, value: String) -> (String, TagCateg
 @ email : String [UK,ENCRYPTED,IX]  # Shows: [encrypted] (highest priority)
 
 # FK with enum - shows both tags
-- status : StatusEnum [FK:Status._id,ENUM:active,inactive]  # Shows: [fk - Status] [enum]
+- status : StatusEnum [FK:Status._id,ENUM:(active,inactive)]  # Shows: [fk - Status] [enum]
 
 # System field with default
 - created_at : DateTime [SYSTEM,DEFAULT:CURRENT_TIMESTAMP]  # Shows: [• now]

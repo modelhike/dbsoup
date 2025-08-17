@@ -301,9 +301,18 @@ public class DBSoupValidator {
             "Point", "Polygon", "LineString", "Buffer", "BinData"
         ]
         
-        if !validTypes.contains(type) {
-            warnings.append("Unknown data type '\(type)' for field '\(field.names.joined(separator: ", "))' in entity '\(entity.name)'")
+        // Check if it's a valid built-in type
+        if validTypes.contains(type) {
+            return
         }
+        
+        // Check if it's an entity name from the schema (for embedded entities)
+        let allEntityNames = getAllEntityNames()
+        if allEntityNames.contains(type) {
+            return
+        }
+        
+        warnings.append("Unknown data type '\(type)' for field '\(field.names.joined(separator: ", "))' in entity '\(entity.name)'")
     }
     
     private func validateParametricDataType(_ type: String, params: [String], field: Field, entity: Entity) {
@@ -400,10 +409,154 @@ public class DBSoupValidator {
             if constraint.value == nil {
                 errors.append(.invalidConstraint("ENUM constraint requires values", entity: entity.name, field: field.names.joined(separator: ", ")))
             }
-        case "SYSTEM", "AUTO", "AUTO_INCREMENT", "ENCRYPTED", "COMPRESSED":
+        case "SYSTEM", "AUTO", "AUTO_INCREMENT", "ENCRYPTED", "ENCRYPT":
             // Valid system constraints
             break
+        case "SPATIAL":
+            // Valid spatial/geographic constraint for coordinate fields
+            break
+        case "BASE64":
+            // Valid encoding constraint for binary data
+            break
+        case "CURRENCY":
+            // Valid constraint for monetary values
+            break
+        case "MASK":
+            // Valid masking constraint for data privacy
+            break
+        case "PARTITION":
+            // Valid partitioning constraint for scalability
+            break
+        case "AUDIT":
+            // Valid audit constraint for compliance
+            break
+        case "COMPUTED":
+            // Valid computed field constraint
+            break
+        case "TTL":
+            // Valid time-to-live constraint
+            break
+        case "CACHE":
+            // Valid caching constraint
+            break
+        case "DEPRECATED":
+            // Valid deprecation marker
+            break
+        case "PII":
+            // Valid personal identifiable information marker
+            break
+        case "GENERATED":
+            // Valid generated field constraint
+            break
+        case "CHECK":
+            // Valid check constraint
+            break
+        case "COLLATION":
+            // Valid collation constraint for text fields
+            break
+        case "PRECISION":
+            // Valid precision constraint for numeric fields
+            break
+        case "SHARD":
+            // Valid sharding constraint for horizontal scaling
+            break
+        case "CIX":
+            // Valid compound index constraint
+            break
+        case "PIX":
+            // Valid partial index constraint
+            break
+        case "CACHED":
+            // Valid caching constraint for performance
+            break
+        case "VALIDATE":
+            // Valid validation rule constraint
+            break
+        case "COMPRESSED":
+            // Valid compression constraint for data storage optimization
+            break
+        case "DERIVED":
+            // Valid constraint for fields derived from external sources
+            break
+        case "IMMUTABLE":
+            // Valid constraint for fields that cannot be changed after creation
+            break
+        case "REPLICATE":
+            // Valid constraint for fields that are replicated across systems
+            break
+        case "FEDERATED":
+            // Valid constraint for fields in federated/distributed systems
+            break
+        case "IDENTITY":
+            // Valid identity constraint for auto-incrementing with seed/increment
+            break
+        case "VIRTUAL":
+            // Valid virtual field constraint for computed fields
+            break
+        case "STORED":
+            // Valid stored computed field constraint
+            break
+        case "COMPRESS":
+            // Valid compression algorithm constraint (alternative to COMPRESSED)
+            break
+        case "BACKUP":
+            // Valid backup strategy constraint
+            break
+        case "MONITOR":
+            // Valid monitoring threshold constraint
+            break
+        case "CHARSET":
+            // Valid character set constraint
+            break
+        case "TIMEZONE":
+            // Valid timezone constraint
+            break
+        case "ATLAS":
+            // Valid MongoDB Atlas feature constraint
+            break
+        case "REALM":
+            // Valid MongoDB Realm setting constraint
+            break
+        case "CHANGE":
+            // Valid change stream configuration constraint
+            break
+        case "TRANSACTION":
+            // Valid transaction setting constraint
+            break
+        case "TIMESERIES":
+            // Valid time series field designation constraint
+            break
+        case "READ":
+            // Valid read preference constraint
+            break
+        case "WRITE":
+            // Valid write concern constraint
+            break
+        case "MULTIKEY":
+            // Valid multikey index constraint
+            break
+        case "SPARSE":
+            // Valid sparse index constraint
+            break
+        case "HASHED":
+            // Valid hashed index constraint
+            break
+        case "TEXT":
+            // Valid text index constraint
+            break
+        case "RLS":
+            // Valid row-level security policy constraint
+            break
+        case "COLLATE":
+            // Valid collation constraint (alternative to COLLATION)
+            break
         default:
+            // Check if it's a cardinality specification (like "0..*", "1..*", etc.)
+            if constraint.name.contains("..") {
+                // This is likely a cardinality specification that was incorrectly parsed as a constraint
+                // Skip warning for cardinality patterns
+                break
+            }
             warnings.append("Unknown constraint '\(constraint.name)' for field '\(field.names.joined(separator: ", "))' in entity '\(entity.name)'")
         }
     }

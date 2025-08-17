@@ -141,6 +141,42 @@ This document provides a comprehensive 138-point quality checklist for validatin
 - [ ] 99. Encrypted fields marked with `@`
 - [ ] 100. Sensitive data marked with `~` or `@`
 - [ ] 101. Audit trails documented with `$` or `[AUDIT]`
+- [ ] 102. Spatial fields marked with `[SPATIAL]` constraint
+- [ ] 103. Base64 encoded fields marked with `[BASE64]`
+- [ ] 104. Currency fields marked with `[CURRENCY]`
+- [ ] 105. Encrypted fields marked with `[ENCRYPTED]` or `[ENCRYPT:algorithm]`
+- [ ] 106. PII fields marked with `[PII]` constraint
+- [ ] 107. Compressed data marked with `[COMPRESSED]`
+- [ ] 108. Cached fields marked with `[CACHE]` or `[CACHED:strategy]`
+- [ ] 109. TTL fields marked with `[TTL:duration]`
+- [ ] 110. Sharded fields marked with `[SHARD:strategy]`
+- [ ] 111. Validation rules documented with `[VALIDATE:rule]`
+- [ ] 112. Check constraints documented with `[CHECK:condition]`
+- [ ] 113. Deprecated fields marked with `[DEPRECATED]`
+- [ ] 114. Generated fields marked with `[GENERATED]`
+- [ ] 115. Collation rules documented with `[COLLATION:rule]`
+- [ ] 116. Precision requirements marked with `[PRECISION:digits]`
+- [ ] 117. Identity fields marked with `[IDENTITY:(seed,incr)]`
+- [ ] 118. Virtual fields marked with `[VIRTUAL:expr]`
+- [ ] 119. Stored computed fields marked with `[STORED:expr]`
+- [ ] 120. Compression algorithm marked with `[COMPRESS:algorithm]`
+- [ ] 121. Backup strategy marked with `[BACKUP:strategy]`
+- [ ] 122. Monitoring thresholds marked with `[MONITOR:threshold]`
+- [ ] 123. Character sets marked with `[CHARSET:encoding]`
+- [ ] 124. Timezone specifications marked with `[TIMEZONE:zone]`
+- [ ] 125. Row-level security marked with `[RLS:policy]`
+- [ ] 126. Collation rules marked with `[COLLATE:collation]`
+- [ ] 127. MongoDB Atlas features marked with `[ATLAS:feature]`
+- [ ] 128. MongoDB Realm settings marked with `[REALM:setting]`
+- [ ] 129. Change streams marked with `[CHANGE:stream]`
+- [ ] 130. Transaction settings marked with `[TRANSACTION:setting]`
+- [ ] 131. Time series fields marked with `[TIMESERIES:field]`
+- [ ] 132. Read preferences marked with `[READ:preference]`
+- [ ] 133. Write concerns marked with `[WRITE:concern]`
+- [ ] 134. Multikey indexes marked with `[MULTIKEY]`
+- [ ] 135. Sparse indexes marked with `[SPARSE]`
+- [ ] 136. Hashed indexes marked with `[HASHED]`
+- [ ] 137. Text indexes marked with `[TEXT]`
 - [ ] 102. Data masking patterns specified
 - [ ] 103. GDPR compliance features noted
 - [ ] 104. Row-level security policies documented
